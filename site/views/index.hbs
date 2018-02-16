@@ -1,0 +1,333 @@
+<div class="person-menu">
+  <ul>
+    {{#each people}}
+    <li><img src="/img/empty-pic.png" alt="{{name}}" class="profile-pic-lg">{{name}}</li>
+    {{/each}}
+  </ul>
+</div>
+<div class="filters">
+  <label for="showCompletedCheck">Show Completed Tasks</label>
+  {{#if showCompletedTasks}}
+    <input type="checkbox" checked id="showCompletedCheck" name="showCompletedCheck">  
+  {{else}}
+    <input type="checkbox" id="showCompletedCheck" name="showCompletedCheck">  
+  {{/if}}
+    <label for="showDeletedCheck">Show Deleted Tasks</label>
+  {{#if showDeletedTasks}}
+    <input type="checkbox" checked id="showDeletedCheck" name="showDeletedCheck">
+  {{else}}
+    <input type="checkbox" id="showDeletedCheck" name="showDeletedCheck">
+  {{/if}}
+</div>
+
+<div class="content">
+  {{#if threeColumn}}
+    <div class="three-column not-started-column" id="not-started-column">
+  {{/if}}
+  {{#if fourColumn}}
+    <div class="four-column not-started-column" id="not-started-column">
+  {{/if}}
+  {{#if fiveColumn}}
+    <div class="five-column not-started-column" id="not-started-column">
+  {{/if}}
+    <div class="column-header not-started-header">
+      <label>Not Started</label>
+    </div>
+    {{#each notStartedTasks}}
+      <div class="task-item">
+        <div class="undo-label-div" id="{{id}}">
+            {{! placeholder div for the undo label}} 
+          </div>
+          <div class="task-item-header">
+            <div class="task-item-name">
+              {{#if overdue}}
+                <i class="fa fa-warning overdue-icon"></i>
+              {{/if}}
+              <label>{{title}}</label>
+            </div>
+            <div class="task-item-pic"> 
+              <img class="profile-pic-sm" src="/img/empty-pic.png" alt="{{name}}">
+            </div>
+          </div>
+          <div class="task-item-body">
+            <div class="task-item-top-line">
+            <div>
+            {{#if overdue}}
+              <!--<label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}}</label>-->
+              <label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}} ({{timeOverdue}} Late)</label>
+            {{else}}
+              <label></i>{{dateFormat dueDate "ddd, MM/D/YY"}}</label>
+            {{/if}}
+            {{#if frequencyTime}}
+              <div class="task-item-frequency pull-right"> 
+                <label><i class="fa fa-repeat"></i> {{frequencyTime}} {{frequencyCadence}}</label>
+              </div>
+            {{/if}}
+            </div>
+          </div>
+            <div class="task-item-description">
+              <label>{{description}}</label>
+            </div>
+            <div class="task-item-bottom-line">
+              <label class="bottom-label" style="background-color: {{categoryBgHex}}; color: {{categoryFgHex}}">{{categoryName}}</label>
+              <label class="bottom-label" style="background-color: {{ownerBgHex}}; color: {{ownerFgHex}}">{{owner}}</label>
+            </div>
+            <div class="task-item-icons">
+              <div class="status-buttons">
+                <label class="start-btn start" data-id="{{id}}"><i class="fa fa-play start" data-id="{{id}}"></i></label>
+                <label class="pause-btn pause" data-id="{{id}}"><i class="fa fa-pause pause" data-id="{{id}}"></i></label>
+                <label class="complete-btn complete" data-id="{{id}}"><i class="fa fa-check complete" data-id="{{id}}"></i></label>
+                <label class="skip-btn skip" data-id="{{id}}"><i class="fa fa-step-forward skip" data-id="{{id}}"></i></label>
+              </div>
+              <div class="edit-buttons">
+                <label class="delete-btn"><i class="fa fa-trash-o delete-task-icon" data-id="{{id}}"></i></label>
+                <label class="edit-btn"><a href="/task/edit/{{id}}"><i class="fa fa-pencil"></i></a></label>
+              </div>
+            </div>
+        </div>
+      </div>
+    {{/each}}
+    <div class="add-task-button" id="add-task-button">
+      <a href="/add-task"><i class="fa fa-plus-square-o fa-2x"></i></a>
+    </div>
+  </div>
+
+  {{#if threeColumn}}
+    <div class="three-column in-progress-column" id="in-progress-column">
+  {{/if}}
+  {{#if fourColumn}}
+    <div class="four-column in-progress-column" id="in-progress-column">
+  {{/if}}
+  {{#if fiveColumn}}
+    <div class="five-column in-progress-column" id="in-progress-column">
+  {{/if}}
+    <div class="column-header in-progress-header">
+      <label>In Progress</label>
+    </div>
+    {{#each inProgressTasks}}
+      <div class="task-item">
+        <div class="undo-label-div" id="{{id}}">
+          {{! placeholder div for the undo label}} 
+        </div>
+        <div class="task-item-header">
+          <div class="task-item-name">
+            {{#if overdue}}
+              <i class="fa fa-warning"></i>
+            {{/if}}
+            <label>{{title}}</label>
+          </div>
+          <div class="task-item-pic"> 
+            <img src="/img/empty-pic.png" alt="{{name}}" class="profile-pic-sm">
+          </div>
+        </div>
+        <div class="task-item-body">
+          <div class="task-item-top-line">
+            <div>
+              {{#if overdue}}
+                <label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}} ({{timeOverdue}} Late)</label>
+              {{else}}
+              <label></i>{{dateFormat dueDate "ddd, MM/D/YY"}}</label>
+              {{/if}}
+              {{#if frequencyTime}}
+              <div class="task-item-frequency pull-right"> 
+                <label><i class="fa fa-repeat"></i> {{frequencyTime}} {{frequencyCadence}}</label>
+              </div>
+            {{/if}}
+            </div>
+          </div>
+            <div class="task-item-description">
+              <label>{{description}}</label>
+            </div>
+            <div class="task-item-bottom-line">
+              <label class="bottom-label" style="background-color: {{categoryBgHex}}; color: {{categoryFgHex}}">{{categoryName}}</label>
+              <label class="bottom-label" style="background-color: {{ownerBgHex}}; color: {{ownerFgHex}}">{{owner}}</label>
+            </div>
+            <div class="task-item-icons">
+              <div class="status-buttons">
+                <label class="not-started-btn stop" data-id="{{id}}"><i class="fa fa-stop stop" data-id="{{id}}"></i></label>
+                <label class="pause-btn pause" data-id="{{id}}"><i class="fa fa-pause pause" data-id="{{id}}"></i></label>
+                <label class="complete-btn complete" data-id="{{id}}"><i class="fa fa-check complete" data-id="{{id}}"></i></label>
+                <label class="skip-btn skip" data-id="{{id}}"><i class="fa fa-step-forward skip" data-id="{{id}}"></i></label>
+              </div>
+              <div class="edit-buttons">
+                <label class="edit-btn"><a href="/task/edit/{{id}}"><i class="fa fa-pencil"></i></a></label>
+                <label class="delete-btn"><i class="fa fa-trash-o delete-task-icon" data-id="{{id}}"></i></label>
+              </div>
+            </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+  
+  {{#if threeColumn}}
+    <div class="three-column paused-column" id="paused-column">
+  {{/if}}
+  {{#if fourColumn}}
+    <div class="four-column paused-column" id="paused-column">
+  {{/if}}
+  {{#if fiveColumn}}
+    <div class="five-column paused-column" id="paused-column">
+  {{/if}}
+    <div class="column-header paused-header">
+      <label>Paused</label>
+    </div>
+    {{#each pausedTasks}}
+      <div class="task-item">
+        <div class="undo-label-div" id="{{id}}">
+          {{! placeholder div for the undo label}} 
+          </div>
+        <div class="task-item-header">
+          <div class="task-item-name">
+            {{#if overdue}}
+              <i class="fa fa-warning"></i>
+            {{/if}}
+            <label>{{title}}</label>
+          </div>
+          <div class="task-item-pic"> 
+            <img src="/img/empty-pic.png" alt="{{name}}" class="profile-pic-sm">
+          </div>
+        </div>
+        <div class="task-item-body">
+          <div class="task-item-top-line">
+            <div>
+              {{#if overdue}}
+                <label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}} ({{timeOverdue}} Late)</label>
+              {{else}}
+              <label></i>{{dateFormat dueDate "ddd, MM/D/YY"}}</label>
+              {{/if}}
+              {{#if frequencyTime}}
+              <div class="task-item-frequency pull-right"> 
+                <label><i class="fa fa-repeat"></i> {{frequencyTime}} {{frequencyCadence}}</label>
+              </div>
+            {{/if}}
+            </div>
+          </div>
+            <div class="task-item-description">
+              <label>{{description}}</label>
+            </div>
+            <div class="task-item-bottom-line">
+              <label class="bottom-label" style="background-color: {{categoryBgHex}}; color: {{categoryFgHex}}">{{categoryName}}</label>
+              <label class="bottom-label" style="background-color: {{ownerBgHex}}; color: {{ownerFgHex}}">{{owner}}</label>
+            </div>
+            <div class="task-item-icons">
+              <div class="status-buttons">
+                <label class="start-btn start" data-id="{{id}}"><i class="fa fa-play start" data-id="{{id}}"></i></label>
+                <label class="not-started-btn stop" data-id="{{id}}"><i class="fa fa-stop stop" data-id="{{id}}"></i></label>
+                <label class="complete-btn complete" data-id="{{id}}"><i class="fa fa-check complete" data-id="{{id}}"></i></label>
+                <label class="skip-btn skip" data-id="{{id}}"><i class="fa fa-step-forward skip" data-id="{{id}}"></i></label>
+              </div>
+              <div class="edit-buttons">
+                <label class="edit-btn"><a href="/task/edit/{{id}}"><i class="fa fa-pencil"></i></a></label>
+                <label class="delete-btn"><i class="fa fa-trash-o delete-task-icon" data-id="{{id}}"></i></label>
+              </div>
+            </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+  
+  {{#if showCompletedTasks}}
+    {{#if threeColumn}}
+      <div class="three-column completed-column" id="completed-column">
+    {{/if}}
+    {{#if fourColumn}}
+      <div class="four-column completed-column" id="completed-column">
+    {{/if}}
+    {{#if fiveColumn}}
+      <div class="five-column completed-column" id="completed-column">
+    {{/if}}
+      <div class="column-header completed-header">
+        <label>Completed(Last 72 Hours)</label>
+      </div>
+      {{#each completedTasks}}
+        <div class="task-item">
+          <div class="task-item-body">
+            <div class="undo-label-div">
+              <label><a href="#" class="undo-completed-task" data-id="{{id}}">Undo Completed Task!</a></label>
+            </div>
+            <div class="task-item-name">
+              {{#if overdue}}
+                <i class="fa fa-warning"></i>
+              {{/if}}
+              <label>{{title}}</label>
+            </div>
+            <div class="task-item-top-line">
+              <div>
+                {{#if overdue}}
+                  <label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}} ({{timeOverdue}} Late)</label>
+                {{else}}
+                <label></i>{{dateFormat dueDate "ddd, MM/D/YY"}}</label>
+                {{/if}}
+                {{#if frequencyTime}}
+                <div class="task-item-frequency pull-right"> 
+                  <label><i class="fa fa-repeat"></i> {{frequencyTime}} {{frequencyCadence}}</label>
+                </div>
+              {{/if}}
+              </div>
+            </div>
+            <div class="task-item-description">
+              <label>{{description}}</label>
+            </div>
+            <div class="task-item-bottom-line">
+              <label class="bottom-label" style="background-color: {{categoryBgHex}}; color: {{categoryFgHex}}">{{categoryName}}</label>
+              <label class="bottom-label" style="background-color: {{ownerBgHex}}; color: {{ownerFgHex}}">{{owner}}</label>
+            </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  {{#if showDeletedTasks}}
+    {{#if threeColumn}}
+      <div class="three-column deleted-column" id="deleted-column">
+    {{/if}}
+    {{#if fourColumn}}
+      <div class="four-column deleted-column" id="deleted-column">
+    {{/if}}
+    {{#if fiveColumn}}
+      <div class="five-column deleted-column" id="deleted-column">
+    {{/if}}
+      <div class="column-header deleted-header">
+        <label>Deleted</label>
+      </div>
+      {{#each deletedTasks}}
+        <div class="task-item">
+          <div class="task-item-body">
+            <div class="undo-label-div">
+              <label><a href="#" class="undo-completed-task" data-id="{{id}}">Undo Deleted Task!</a></label>
+            </div>
+            <div class="task-item-name">
+              {{#if overdue}}
+                <i class="fa fa-warning"></i>
+              {{/if}}
+              <label>{{title}}</label>
+            </div>
+            <div class="task-item-top-line">
+              <div>
+                {{#if overdue}}
+                  <label class="overdue-label">{{dateFormat dueDate "ddd, MM/D/YY"}} ({{timeOverdue}} Late)</label>
+                {{else}}
+                <label></i>{{dateFormat dueDate "ddd, MM/D/YY"}}</label>
+                {{/if}}
+                {{#if frequencyTime}}
+                <div class="task-item-frequency pull-right"> 
+                  <label><i class="fa fa-repeat"></i> {{frequencyTime}} {{frequencyCadence}}</label>
+                </div>
+              {{/if}}
+              </div>
+            </div>
+              <div class="task-item-description">
+                <label>{{description}}</label>
+              </div>
+              <div class="task-item-bottom-line">
+                <label class="bottom-label" style="background-color: {{categoryBgHex}}; color: {{categoryFgHex}}">{{categoryName}}</label>
+                <label class="bottom-label" style="background-color: {{ownerBgHex}}; color: {{ownerFgHex}}">{{owner}}</label>
+              </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{/if}}
+</div>
+<script src="/index.js"></script>
