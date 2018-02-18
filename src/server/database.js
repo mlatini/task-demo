@@ -8,63 +8,64 @@ const Settings = require('../../models/settings');
 const Task = require('../../models/task');
 const User = require('../../models/user');
 
-module.exports = function Database(tenantId) {
+module.exports = function Database() {
  let tasks = [];
  let settings = new Settings();
+ let tenantId = '';
 
- this.initialize = function(callback) {
+
+ this.initialize = function(id, callback) {
   // Load the database filestore. If it doesn't exist, create
-  // the default store. 
-  const file = 'store/' + tenantId + '.json';
-  jsonfile.readFile(file, (err, object) => {
-    if(err || !object) {
-      createDefaultStore(( (err) => {
-        if(!err) {
-          console.log('default store created');
-          return callback(null);
-        } else {
-          return callback(err);
-        }
-      }));
-    } else {
-      return callback(null);
-    }
-  });
- };
+  // the default store. This is meant to be called at application
+  // load to make sure there's a default store available. 
+  // callback = function(err) 
+  if(!id) {
+    return callback('Database initialization failed due to invalid id');
+  } else {
+    tenantId = id;
+    const file = 'store/' + tenantId + '.json';
+    jsonfile.readFile(file, (err, object) => {
+      if(err || !object) {
+        Seed(( (err) => {
+          if(!err) {
+            console.log('default store created');
+            return callback(null);
+          } else {
+            return callback('Database initialization failed during readFile');
+          }
+        }));
+      } else {
+        return callback(null);
+      }
+    });
+  }
+};
 
-  function createDefaultStore(callback) {
-    // Create a default store for the current user. This is intended to 
-    // be called if a store doesn't exist. 
-    let newTask1 = new Task();
-    let newTask2 = new Task();
-    let newUser = new User();
-    let newSettings = new Settings();
-    let red = new Color();
-    let black = new Color();
-    let white = new Color();
-    let lightBlue = new Color();
-    let green = new Color();
-    let darkBlue = new Color();
-    let orange = new Color();
-    let purple = new Color();
-    let pink = new Color();
-    let gettingStartedCategory = new Category();
-    let homeCategory = new Category();
-    let financeCategory = new Category();
+  function Seed(callback) {
+    // Seed the Database with default data for the current user. 
+    // This is intended to be called if a store doesn't exist. 
+    let newTask1 = new Task(),
+    newTask2 = new Task(),
+    newUser = new User(),
+    newSettings = new Settings(),
+    red = new Color(),
+    black = new Color(),
+    white = new Color(),
+    lightBlue = new Color(),
+    green = new Color(),
+    darkBlue = new Color(),
+    orange = new Color(),
+    purple = new Color(),
+    pink = new Color(),
+    gettingStartedCategory = new Category(),
+    homeCategory = new Category(),
+    financeCategory = new Category();
 
     let newDataStore = {
-      tasks: [
-
-      ],
-      users: [
-
-      ],
-      colors: [
-
-      ],
-      categories: [
-
-      ]
+      tasks: [ ],
+      users: [ ],
+      colors: [ ],
+      categories: [ ]
     };
 
     // Create the id's first. They are required because users, tasks, etc
@@ -205,7 +206,7 @@ module.exports = function Database(tenantId) {
     const file = 'store/' + tenantId + '.json';
     jsonfile.writeFile(file, newDataStore, (err) => {
       if(err) {
-        console.error('error in createDefaultStore' + err);
+        console.error('error in Seed function' + err);
       } else {
         console.log('successfully pushed default settings to ' +
           'the store', newDataStore);
@@ -214,13 +215,38 @@ module.exports = function Database(tenantId) {
     });
   }
   
-  this.getAllTasks = function(callback) {
-    const file = 'store/' + tenantId + '.json';
-    jsonfile.readFile(file, (err, object) => {
-      if(err) {
-        return callback(err, null);
-      } else {
-        return callback(null, object.tasks);
+  this.getAllTasks = function(options, callback) {
+    // callback = (err, tasks)
+    // an object of associated models to query. Valid options are:
+    //  owner
+    //  category
+    // Returns an object with the tasks and any sub-items or an empty object
+    // 
+    const owner = options.owner || null,
+    category = options.category || null, 
+    file = 'store/' + tenantId + '.json';
+    
+    let tasks = {}, 
+    owners = [],
+    categories = [];
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) { 
+        return callback('No tasks returned', null);
+      } else { // add 'owner' object under task. 
+        if(owner) {
+          for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+            for(let j = 0, max = db.users.length; i < max; i += 1) {
+              if(db.tasks[i]._owner === db.users[j].id) {
+                db.tasks[i].owner = db.users[j];
+                break;
+              }
+            }
+          }
+        }
+        console.log('getting ready to return the tasks', db.tasks);
+        // Good to go, return the tasks.  
+        return callback(null, db.tasks);
       }
     });
   };
@@ -231,6 +257,7 @@ module.exports = function Database(tenantId) {
       if(err) {
         return callback(err, null);
       } else {
+        console.log('getting ready to return settings', object.settings)
         return callback(null, object.settings);
       }
     });
