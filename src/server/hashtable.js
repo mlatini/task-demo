@@ -1,36 +1,55 @@
-const LinkedList = require('./linkedlist.js');
+module.exports = function HashTable() {
+  const LinkedList = require('./linkedlist');
 
-module.export = function HashTable() {
-  let table = [];
-  let length = 0;
+  let table = [], 
+  length = 0,
+  linkedList = new LinkedList();
 
   let hash = function(key) {
-    let hash = 0;
-    for(let i = 0; i < key.length; i++) {
-      hash += key.charAt(i);
-    }
-    hash = hash % 31;
+    let hash = '';
 
-    return hash;
+    for(let i = 0, max = key.length; i < max; i += 1) {
+      hash += key.charCodeAt(i);
+    }
+    return hash % 31;
   };
 
-  function ValuePair(key, value) {
+  let ValuePair = function(key, value) {
     this.key = key;
     this.value = value;
-  }
+  };
 
   this.put = function(key, value) {
-    let hash = hash(key);
-    let valuePair = new ValuePair(key, value);
+    const hashedKey = hash(key),
+    valuePair = new ValuePair(key, value);
 
-    if(table[hash] === undefined) {
-      let linkedList = new LinkedList();
-
-      linkedList.addLast(valuePair);
-      table[hash].push(linkedList);
+    if(table[hashedKey] === undefined) {
+      let linkedList = new LinkedList(); 
+        linkedList.addLast(valuePair);
+        table[hashedKey] = linkedList;
     } else {
-      table[hash].addLast(valuePair);
+      table[hashedKey].addLast(valuePair);
     }
-    length++;
+    length += 1;
+    return true;
+  };
+
+  this.get = function(key) {
+    const hashedKey = hash(key);
+
+    if(table[hashedKey] !== undefined) {
+      let current = table[hashedKey].getHead();
+      while(current) {
+        if(current.element.key === key) {
+          return current.element.value;
+        }
+        current = current.next;
+      }
+      return undefined;
+    }
+  };
+
+  this.size = function() {
+    return length;
   };
 };

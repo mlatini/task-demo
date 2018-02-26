@@ -1,70 +1,68 @@
 const uuidv1 = require('uuid/v1');
 const jsonfile = require('jsonfile');
+const HashTable = require('./hashtable');
 
 const Category = require('../../models/category');
 const Color = require('../../models/color');
-const Role = require('../../models/role');
 const Settings = require('../../models/settings');
 const Task = require('../../models/task');
 const User = require('../../models/user');
 
-module.exports = function Database(tenantId) {
- let tasks = [];
- let settings = new Settings();
+module.exports = function Database() {
+ let tenantId = '';
 
- this.initialize = function(callback) {
-  // Load the database filestore. If it doesn't exist, create
-  // the default store. 
-  const file = 'store/' + tenantId + '.json';
-  jsonfile.readFile(file, (err, object) => {
-    if(err || !object) {
-      createDefaultStore(( (err) => {
-        if(!err) {
-          console.log('default store created');
-          return callback(null);
-        } else {
-          return callback(err);
-        }
-      }));
-    } else {
-      return callback(null);
-    }
-  });
- };
 
-  function createDefaultStore(callback) {
-    // Create a default store for the current user. This is intended to 
-    // be called if a store doesn't exist. 
-    let newTask1 = new Task();
-    let newTask2 = new Task();
-    let newUser = new User();
-    let newSettings = new Settings();
-    let red = new Color();
-    let black = new Color();
-    let white = new Color();
-    let lightBlue = new Color();
-    let green = new Color();
-    let darkBlue = new Color();
-    let orange = new Color();
-    let purple = new Color();
-    let pink = new Color();
-    let gettingStartedCategory = new Category();
-    let homeCategory = new Category();
-    let financeCategory = new Category();
+ this.initialize = function(id, callback) {
+  // If the filestore doesn't exist, create
+  // the default store. This is meant to be called at application
+  // load to make sure there's a default store available. 
+  // callback = function(err) 
+  if(!id) {
+    return callback('Database initialization failed due to invalid id');
+  } else {
+    tenantId = id;
+    const file = 'store/' + tenantId + '.json';
+    jsonfile.readFile(file, (err, object) => {
+      if(err || !object) {
+        Seed(( (err) => {
+          if(!err) {
+            return callback(null);
+          } else {
+            return callback('Database initialization failed during readFile');
+          }
+        }));
+      } else {
+        return callback(null);
+      }
+    });
+  }
+};
+
+  function Seed(callback) {
+    // Seed the Database with default data for the current user. 
+    // This is intended to be called if a store doesn't exist. 
+    let newTask1 = new Task(),
+    newTask2 = new Task(),
+    newUser = new User(),
+    newSettings = new Settings(),
+    red = new Color(),
+    black = new Color(),
+    white = new Color(),
+    lightBlue = new Color(),
+    green = new Color(),
+    darkBlue = new Color(),
+    orange = new Color(),
+    purple = new Color(),
+    pink = new Color(),
+    gettingStartedCategory = new Category(),
+    homeCategory = new Category(),
+    financeCategory = new Category();
 
     let newDataStore = {
-      tasks: [
-
-      ],
-      users: [
-
-      ],
-      colors: [
-
-      ],
-      categories: [
-
-      ]
+      tasks: [ ],
+      users: [ ],
+      colors: [ ],
+      categories: [ ]
     };
 
     // Create the id's first. They are required because users, tasks, etc
@@ -75,7 +73,7 @@ module.exports = function Database(tenantId) {
     newTask2.id = uuidv1();
     gettingStartedCategory.id = uuidv1();
     homeCategory.id = uuidv1();
-    financeCategory = uuidv1();
+    financeCategory.id = uuidv1();
     red.id = uuidv1();
     black.id = uuidv1();
     white.id = uuidv1();
@@ -205,23 +203,72 @@ module.exports = function Database(tenantId) {
     const file = 'store/' + tenantId + '.json';
     jsonfile.writeFile(file, newDataStore, (err) => {
       if(err) {
-        console.error('error in createDefaultStore' + err);
+        return callback('error in Seed function' + err);
       } else {
-        console.log('successfully pushed default settings to ' +
-          'the store', newDataStore);
         return callback(null);
       }
     });
   }
   
-  this.getAllTasks = function(callback) {
-    const file = 'store/' + tenantId + '.json';
-    jsonfile.readFile(file, (err, object) => {
-      if(err) {
-        return callback(err, null);
-      } else {
-        return callback(null, object.tasks);
+  this.getAllTasks = function(options, callback) {
+    // callback = (err, tasks)
+    // an object of associated models to query. Valid options are:
+    //  owner
+    //  category
+    // Returns an object with the tasks and any sub-items or an empty object
+    // 
+    const populateOwner = options.populateOwner || null,
+    populateCategory = options.populateCategory || null, 
+    file = 'store/' + tenantId + '.json';
+    
+    let users = new HashTable(),
+    categories = new HashTable(),
+    colors = new HashTable();
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) { 
+        return callback('No tasks returned', null);
+      } else {  
+        // If populateOwner or populateCategory is paased into options, 
+        // the colors will be needed so populate the colors hashTable. 
+        if(populateOwner || populateCategory) {
+          for(let i = 0, max = db.colors.length; i < max; i += 1) {
+            colors.put(db.colors[i].id, db.colors[i]);
+            console.log('newly added color',colors.get(db.colors[i].id));
+          }
+        }
+
+        // populate the owner and category Hash Tables, if
+        // they are passed with the options argument. 
+        if(populateOwner) {
+          for(let i = 0, max = db.users.length; i < max; i += 1) {
+            users.put(db.users[i].id, db.users[i]);
+          }
+        }
+        if(populateCategory) {
+          for(let i = 0, max = db.categories.length; i < max; i += 1) {
+            categories.put(db.categories[i].id, db.categories[i]);
+          }
+        }
+
+        // Populate the owner and category objects of each task, if 
+        // options.populateCategory and/or options.populateOwner
+        for(let i = 0, max = db.tasks.length; i < max; i +=1) {
+          if(populateOwner) {
+            let owner = users.get(db.tasks[i]._owner);
+            owner.color = colors.get(owner._color);
+            db.tasks[i].owner = owner;
+          }
+          if(populateCategory) {
+            let category = categories.get(db.tasks[i]._category);
+            category.color = colors.get(category._color);
+            db.tasks[i].category = category;
+          }
+        }
       }
+      // Good to go, return the tasks.  
+      console.log('db.tasks', db.tasks);
+      return callback(null, db.tasks);
     });
   };
 
