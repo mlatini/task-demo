@@ -1,6 +1,5 @@
 const expect = require('chai').expect,
-uuidv1 = require('uuid/v1'),
-Database = require('../src/server/database')
+Database = require('../src/server/database');
 
 let database = new Database(),
 uuid = 123;
@@ -27,10 +26,17 @@ describe('Database', function() {
         done();
       });
     });
-    it('should return an array with tasks.owner if "owner" is passed to' +
-      ' options', function(done) {
-        database.getAllTasks({ 'owner': true }, function(err, tasks) {
-          expect(tasks[0].owner).to.not.be.an('undefined');
+    it('should return an object of tasks[x].owner if "populateOwner" is ' + 
+     'passed to options', function(done) {
+        database.getAllTasks({ 'populateOwner': true }, function(err, tasks) {
+          expect(tasks[0].owner).to.be.an('object');
+          done();
+        });
+      });
+    it('should return an object of task[x].category is populateCategories ' +
+      'is passed to options', function(done) {
+        database.getAllTasks({ 'populateCategory': true }, function(err, tasks) {
+          expect(tasks[0].category).to.be.an('object');
           done();
         });
       });
