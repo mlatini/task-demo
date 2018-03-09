@@ -234,7 +234,6 @@ module.exports = function Database() {
         if(populateOwner || populateCategory) {
           for(let i = 0, max = db.colors.length; i < max; i += 1) {
             colors.put(db.colors[i].id, db.colors[i]);
-            console.log('newly added color',colors.get(db.colors[i].id));
           }
         }
 
@@ -267,7 +266,6 @@ module.exports = function Database() {
         }
       }
       // Good to go, return the tasks.  
-      console.log('db.tasks', db.tasks);
       return callback(null, db.tasks);
     });
   };
@@ -280,6 +278,43 @@ module.exports = function Database() {
       } else {
         return callback(null, object.settings);
       }
+    });
+  };
+  
+  // update the settings. Will either update the schedules, categories
+  // or admin depending on what is passed into the function. Note that
+  // it can update all of them on a single call.
+  // Arguments:
+  //  Settings Object
+  //  Callback(err, settings)
+  this.updateSettings = function(options, callback) {
+    const file = 'store/' + tenantId + '.json';
+    jsonfile.readFile(file, (err, db) => {
+      if(options.tasks) {
+        if(options.tasks.showCompletedTasks !== null) {
+          db.settings.tasks.showCompletedTasks = options.tasks.showCompletedTasks;
+        }
+        if(options.tasks.showDeletedTasks !== null) {
+          db.settings.tasks.showDeletedTasks = options.tasks.showDeletedTasks;
+        }
+      }
+      if(options.categories) {
+        if(options.categories.showArchivedTasks !== null) {
+          db.settings.categories.showArchivedTasks = options.categories.showArchivedTasks;
+        }
+      }
+      if(options.admin) {
+        if (options.admin.showArchivedUsers !== null) {
+          db.settings.admin.showArchivedUsers = options.admin.showArchivedUsers;
+        }
+      }
+      jsonfile.writeFile(file, db, (err) => {
+        if(err) {
+          return callback(err, null);
+        } else {
+          return callback(null, db.settings);
+        }
+      });
     });
   };
 };

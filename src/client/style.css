@@ -15,6 +15,19 @@
   cursor: pointer;
 }
 
+.active-page-link {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+/* stop the active page link from
+ * changing color on hover
+ */
+.active-page-link:hover {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
 .top-menu {
   z-index: 1;
   height: 32px;

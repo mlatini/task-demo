@@ -6,17 +6,17 @@
   </ul>
 </div>
 <div class="filters">
-  <label for="showCompletedCheck">Show Completed Tasks</label>
+  <label for="show-completed-check">Show Completed Tasks</label>
   {{#if showCompletedTasks}}
-    <input type="checkbox" checked id="showCompletedCheck" name="showCompletedCheck">  
+    <input type="checkbox" checked id="show-completed-check" name="show-completed-check">  
   {{else}}
-    <input type="checkbox" id="showCompletedCheck" name="showCompletedCheck">  
+    <input type="checkbox" id="show-completed-check" name="show-completed-check">  
   {{/if}}
-    <label for="showDeletedCheck">Show Deleted Tasks</label>
+    <label for="show-deleted-check">Show Deleted Tasks</label>
   {{#if showDeletedTasks}}
-    <input type="checkbox" checked id="showDeletedCheck" name="showDeletedCheck">
+    <input type="checkbox" checked id="show-deleted-check" name="show-deleted-check">
   {{else}}
-    <input type="checkbox" id="showDeletedCheck" name="showDeletedCheck">
+    <input type="checkbox" id="show-deleted-check" name="show-deleted-check">
   {{/if}}
 </div>
 
@@ -330,4 +330,4 @@
     </div>
   {{/if}}
 </div>
-<script src="/index.js"></script>
+<script src="/tasks.js"></script>

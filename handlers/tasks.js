@@ -1,9 +1,9 @@
 const Database = require('../src/server/database');
 const moment = require('moment');
 
-exports.home = (((req, res) => {
+exports.tasks = (((req, res) => {
   let sessionId = req.session.sessionId ? req.session.sessionId : null;
-  let database = new Database(sessionId);
+  let database = new Database();
   let notStartedTasks = [];
   let inProgressTasks = [];
   let pausedTasks = [];
@@ -215,7 +215,7 @@ exports.home = (((req, res) => {
               fourColumn: fourColumn,
               fiveColumn: fiveColumn
             };
-            res.render('index', context);
+            res.render('tasks', context);
           }));
         }));
     }
