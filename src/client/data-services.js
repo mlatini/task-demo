@@ -3,6 +3,57 @@
 // This file will hold all the functions needed to query or update the 
 // database, or otherwise manipulate
 
+
+// Updated functions start
+
+//Update the settings
+exports.updateSettings = function(settings, callback) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
+      if(JSON.parse(this.responseText).error) {
+        return callback(JSON.parse(this.responseText).error);
+      } else {
+        return callback('');
+      }
+    }
+  };
+  var url = '/api/settings/update';
+  xhttp.open('POST', url, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({ 'settings': settings }));
+};
+
+// call /task/id post method which will update the task that's 
+// passed to it. 
+exports.updateTaskStatus = function(task, callback) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
+      if(JSON.parse(this.responseText).error) {
+        return callback(JSON.parse(this.responseText).error);
+      } else {
+        return callback('');
+      }
+    }
+  };
+  var url = '/api/task/update-status';
+  xhttp.open('POST', url, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({ 'task': task }));
+};
+
+
+
+
+
+
+
+
+
+
+// Updated functions end. 
+
 // call /colors get method to query the database and get a list
 // of colors
 // If colors length is > 1 then return an array of colors
@@ -107,62 +158,73 @@ exports.updateUser = function(options, callback) {
     xhttp.send(JSON.stringify(options));
   }
 };
-// call /new-task post method to create a new task and save it to the db.
+// call /new-task post method to save a new task and save it to the db.
+// Args:
+//  task: a task object to create and save to the db. 
+//  callback(err, task)
 // return the new task in the callback
 exports.createNewTask = function(task, callback) {
   var xhttp = new XMLHttpRequest();
-  xhttp.open('POST', '/new-task', true);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify(task));
-  // wait for the callback so I can return the new task
   xhttp.onreadystatechange = function () {
-    if (this.readyState === 4 && this.status === 200) {
-      if (JSON.parse(this.responseText)) {
-        return callback('',JSON.parse(this.responseText));
+    if(this.readyState === 4 && this.status === 200) {
+      if (JSON.parse(this.responseText).error) {
+        return callback(JSON.parse(this.responseText).error, null);
       } else {
+        return callback(null, JSON.parse(this.responseText).task);
       }
     }
   };
-  // TODO: check for error response from post and return to the
-  // calling function if it's present. 
+  xhttp.open('POST', '/api/task/save-new-task', true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({ 'task': task }));
 };
 
 // Call /task get method to get one single task 
+// callback(err, task)
 exports.getTask = function(taskId, callback) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-      if (JSON.parse(this.responseText)) {
-        return callback('',JSON.parse(this.responseText));
+      if (JSON.parse(this.responseText).error) {
+        return callback(JSON.parse(this.responseText).error, null);
       } else {
-        return callback('ERR: No tasks returned', '');
+        return callback(null, JSON.parse(this.responseText).task);
       }
     }
   };
-  var url = '/get-task/' + taskId;
+  var url = '/api/task/get-task/' + taskId;
   xhttp.open('GET', url, true);
   xhttp.send();
 };
 
-// Delete a completed task. This is to be used if the user wants to undo 
-// a completed task, so the auto-created task has to be deleted as well
-// Use the previousTaskID, which is populated at task creation
-exports.deleteCompletedTask = function(previousTaskId, callback) {
+// This will be called to delete a task that was auto-created from using
+// the current task as a template. This is typically done when a user
+// completes a task which has recurrence, and a new task has been created 
+// when the original task was flagged as completed.  
+// This function will typically be called when a user has undone a 
+// completed task, so the new task must be deleted to prevent a duplicate. 
+// Args:
+//  taskId: the taskId of the previous task, not the one to be deleted. 
+//    I will use this to find the previousTaskId of the task to be deleted.
+//  callback(err, deletedTask)
+exports.deleteAutoCreatedTask = function(taskId, callback) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       if (JSON.parse(this.responseText).error) {
         return callback(JSON.parse(this.responseText).error);
       } else {
-        return callback('');
+        return callback(null, JSON.parse(this.responseText).task);
       }
     }
   };
-  var url = '/api/task/delete/previous/' + previousTaskId;
+  var url = '/api/task/delete-previous/' + taskId;
   xhttp.open('POST', url, true);
   xhttp.send();
 };
 
+// This will permanently delete a task. Typical use case would be deleting 
+// when skipping a task
 exports.deleteTask = function(id, callback) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -177,19 +239,6 @@ exports.deleteTask = function(id, callback) {
   var url = '/api/task/delete/' + id;
   xhttp.open('POST', url, true);
   xhttp.send();
-};
-
-// call /task/id post method which will update the task that's 
-// passed to it. 
-exports.updateTaskStatus = function(task, callback) {
-  var xhttp = new XMLHttpRequest();
-  var url = '/task/update-status/';
-  xhttp.open('POST', url, true);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify(task));
-  // TODO: check for error response from post and return to the 
-  // calling function if it's present
-  return callback('');
 };
 
 // call /api/categories/edit post method which will update the category that's
@@ -209,24 +258,6 @@ exports.updateCategory = function(category, callback) {
   xhttp.open('POST', url, true);
   xhttp.setRequestHeader('Content-type', 'application/json');
   xhttp.send(JSON.stringify(category));
-};
-
-//Update the settings
-exports.updateSettings = function(settings, callback) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if(this.readyState == 4 && this.status == 200) {
-      if(JSON.parse(this.responseText).error) {
-        return callback(JSON.parse(this.responseText).error);
-      } else {
-        return callback('');
-      }
-    }
-  };
-  var url = '/api/settings/update';
-  xhttp.open('POST', url, true);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify(settings));
 };
 
 // call /api/categories/archive/:id post method which will archive the category

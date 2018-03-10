@@ -43,6 +43,7 @@ module.exports = function Database() {
     // This is intended to be called if a store doesn't exist. 
     let newTask1 = new Task(),
     newTask2 = new Task(),
+    newTask3 = new Task(),
     newUser = new User(),
     newSettings = new Settings(),
     red = new Color(),
@@ -71,6 +72,7 @@ module.exports = function Database() {
     newSettings.id = uuidv1();
     newTask1.id = uuidv1();
     newTask2.id = uuidv1();
+    newTask3.id = uuidv1();
     gettingStartedCategory.id = uuidv1();
     homeCategory.id = uuidv1();
     financeCategory.id = uuidv1();
@@ -85,11 +87,13 @@ module.exports = function Database() {
     pink.id = uuidv1();
 
     // The default user
-    newUser.name = 'New User';
+    newUser.firstName = 'New';
+    newUser.lastName = 'User';
     newUser._color = darkBlue.id;
     newUser._settings = newSettings.id;
     newUser._ownedTasks.push(newTask1.id);
     newUser._ownedTasks.push(newTask2.id);
+    newUser._ownedTasks.push(newTask3.id);
     newDataStore.users.push(newUser);
 
     // The default settings
@@ -135,12 +139,47 @@ module.exports = function Database() {
     newTask2._category = gettingStartedCategory.id;
     newDataStore.tasks.push(newTask2);
 
+    newTask3.dueDate = new Date();
+    newTask3.createdDate = new Date();
+    newTask3.title = 'Recurring Task';
+    newTask3.description = 'Recurring tasks will auto-create a new follow-up ' +
+      ' task when completed. Try completing this task to see how that works.'
+    newTask3.status = {
+      completed: false,
+      paused: false,
+      inProgress: false,
+      notStarted: true,
+      deleted: false
+    };
+    // Recurrence of evey 5 days. 
+    newTask3.frequency = {
+      'time': 5,
+      'cadence': 'Day'
+    };
+    // frequency : {
+    //   time : Number,
+    //    An integer that determines the number of periods of the cadence 
+    //      below. IE: time of 5 and cadence of 'days' would be every 5 days.
+    //   cadence : String
+    ///   valid options are:
+    //    'Minute'
+    //    'Hour'
+    //    'Day'
+    //    'Week'
+    //    'Month'
+    //    'Year'
+    newTask3._owner = newUser.id;
+    newTask3._createdBy = newUser.id;
+    newTask3._category = gettingStartedCategory.id;
+    newDataStore.tasks.push(newTask3);
+
     // The default categories
     gettingStartedCategory.name = 'getting started';
     gettingStartedCategory.archived = false;
     gettingStartedCategory._color = red.id;
     gettingStartedCategory._tasksWithCategory.push(newTask1.id);
     gettingStartedCategory._tasksWithCategory.push(newTask2.id);
+    gettingStartedCategory._tasksWithCategory.push(newTask3.id);
     newDataStore.categories.push(gettingStartedCategory);
 
     homeCategory.name = 'home';
@@ -209,7 +248,7 @@ module.exports = function Database() {
       }
     });
   }
-  
+
   this.getAllTasks = function(options, callback) {
     // callback = (err, tasks)
     // an object of associated models to query. Valid options are:
@@ -270,8 +309,173 @@ module.exports = function Database() {
     });
   };
 
+  // Get a task from the database by id. 
+  // callback(err, task)
+  this.getTaskById = function(id, callback) {
+    const file = 'store/' + tenantId + '.json', 
+      taskId = id || null;
+
+    let returnTask = null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+          if(db.tasks[i].id === taskId) {
+            returnTask = db.tasks[i];
+            break;
+          }
+        }
+        if(returnTask) {
+          return callback(null, returnTask);
+        } else {
+          return callback('Task not found', null);
+        }
+      }
+    });
+  };
+
+  this.getTaskByPreviousTaskId = function(id, callback) {
+    const file = 'store/' + tenantId + '.json', 
+      taskId = id || null;
+
+    let returnTask = null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+          if(db.tasks[i]._previousTask === taskId) {
+            returnTask = db.tasks[i];
+            break;
+          }
+        }
+        if(returnTask) {
+          return callback(null, returnTask);
+        } else {
+          return callback('Task not found', null);
+        }
+      }
+    });
+  };
+
+  // Save a new task to the database. 
+  // args:
+  //  task: a task object
+  //  callback(err, task)
+  // Returns the newly saved task to the callback. 
+  this.saveNewTask = function(task, callback) {
+    const file = 'store/' + tenantId + '.json', 
+      newTask = task || null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        if(newTask) {
+          newTask.id = uuidv1();
+          db.tasks.push(newTask);
+          jsonfile.writeFile(file, db, (err) => {
+            if(!err) {
+              return callback(null, newTask);
+            } else {
+              return callback('err', null);
+            }
+          });
+        }
+      } 
+      return('Unable to save new task', null);
+    });
+  };
+
+  // Delete a task from the database. This is a permanent and irreversible
+  // delete. A typical use case would be to delete a new auto-created task
+  // from the user's task list when when they want to move a completed or 
+  // deleted task from their task list. 
+  // Another use case would be cleaning out > 72 hour tasks from completed
+  // or deleted tasks. 
+  // args:
+  //  id: task to delete
+  //  callback(err, deletedTask(deep copy of task) )
+  this.deleteTask = function(id, callback){
+    const file = 'store/' + tenantId + '.json',
+      taskId = id || null;
+     
+    let error = null,
+      taskToReturn = null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        if(taskId) {
+          for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+            if(db.tasks[i].id === taskId) {
+              // Make a deep copy of the task before I delete it from db.
+              taskToReturn = JSON.parse(JSON.stringify(db.tasks[i]));
+              db.tasks.splice(i, 1);
+              jsonfile.writeFile(file, db, (err) => {
+                if(err) {
+                  return callback(err, null);
+                } else {
+                  return callback(null, taskToReturn);
+                }
+              });
+            break;
+            }
+          }
+        }
+      }
+    });
+  };
+
+  // Update the task status. 
+  // Arguments:
+  //  Task object
+  //  callback(err, task)
+  this.updateTaskStatus = function(task, callback) {
+    const file = 'store/' + tenantId + '.json';
+
+    let updatedTask = task || null, 
+      taskToUpdate = {};
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+          if(db.tasks[i].id === updatedTask.id) {
+            taskToUpdate = db.tasks[i];
+            break;
+          }
+        }
+        if(taskToUpdate) {
+          taskToUpdate.status.completed = updatedTask.status.completed || false;
+          taskToUpdate.status.paused = updatedTask.status.paused || false;
+          taskToUpdate.status.inProgress = updatedTask.status.inProgress || false;
+          taskToUpdate.status.notStarted = updatedTask.status.notStarted || false;
+          taskToUpdate.status.deleted = updatedTask.status.deleted || false;
+          taskToUpdate.completedDate = updatedTask.completedDate || '';
+          taskToUpdate.deletedDate = updatedTask.deletedDate || '';
+          jsonfile.writeFile(file, db, (err) => {
+            if(err) {
+              return callback(err, null);
+            } else {
+              return callback(null, taskToUpdate);
+            }
+          });
+        } else {
+          return callback('Task not found', null);
+        }
+      }
+    });
+  };
+  
   this.getSettings = function(callback) {
     const file = 'store/' + tenantId + '.json';
+
     jsonfile.readFile(file, (err, object) => {
       if(err) {
         return callback(err, null);
@@ -280,32 +484,32 @@ module.exports = function Database() {
       }
     });
   };
-  
+
   // update the settings. Will either update the schedules, categories
   // or admin depending on what is passed into the function. Note that
   // it can update all of them on a single call.
   // Arguments:
   //  Settings Object
   //  Callback(err, settings)
-  this.updateSettings = function(options, callback) {
+  this.updateSettings = function(settings, callback) {
     const file = 'store/' + tenantId + '.json';
     jsonfile.readFile(file, (err, db) => {
-      if(options.tasks) {
-        if(options.tasks.showCompletedTasks !== null) {
-          db.settings.tasks.showCompletedTasks = options.tasks.showCompletedTasks;
+      if(settings.tasks) {
+        if(settings.tasks.showCompletedTasks !== null) {
+          db.settings.tasks.showCompletedTasks = settings.tasks.showCompletedTasks;
         }
-        if(options.tasks.showDeletedTasks !== null) {
-          db.settings.tasks.showDeletedTasks = options.tasks.showDeletedTasks;
-        }
-      }
-      if(options.categories) {
-        if(options.categories.showArchivedTasks !== null) {
-          db.settings.categories.showArchivedTasks = options.categories.showArchivedTasks;
+        if(settings.tasks.showDeletedTasks !== null) {
+          db.settings.tasks.showDeletedTasks = settings.tasks.showDeletedTasks;
         }
       }
-      if(options.admin) {
-        if (options.admin.showArchivedUsers !== null) {
-          db.settings.admin.showArchivedUsers = options.admin.showArchivedUsers;
+      if(settings.categories) {
+        if(settings.categories.showArchivedTasks !== null) {
+          db.settings.categories.showArchivedTasks = settings.categories.showArchivedTasks;
+        }
+      }
+      if(settings.admin) {
+        if (settings.admin.showArchivedUsers !== null) {
+          db.settings.admin.showArchivedUsers = settings.admin.showArchivedUsers;
         }
       }
       jsonfile.writeFile(file, db, (err) => {

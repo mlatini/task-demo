@@ -42,14 +42,15 @@ document.getElementById('show-deleted-check').onclick = function() {
 // When the user clicks on the status buttons, change
 // the status in the db and refresh the page
 document.addEventListener('click', function() {
-  console.log(event.target);
-  var taskStatus;
-  var taskId = event.target.dataset.id;
-  var task;
+  const taskId = event.target.dataset.id;
+
+  let taskStatus = '', 
+    task = '';
+
   if (event.target.matches('.start')) {
     taskStatus = { 'completed' : false, 'paused' : false, 
       'inProgress' : true, 'notStarted' : false };
-    task = {'_id' : taskId, status : taskStatus};
+    task = {'id' : taskId, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -58,9 +59,10 @@ document.addEventListener('click', function() {
       }
     });
   } else if (event.target.matches('.pause')) {
+    console.log('pause');
     taskStatus = { 'completed' : false, 'paused' : true, 
       'inProgress' : false, 'notStarted' : false };
-    task = {'_id' : taskId, status : taskStatus};
+    task = {'id' : taskId, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -72,7 +74,7 @@ document.addEventListener('click', function() {
     // update task to completed state and then update it in the db
     taskStatus = { 'completed' : true, 'paused' : false, 
       'inProgress' : false, 'notStarted' : false };
-    task = {'completedDate' : Date.now(), '_id' : taskId, status : taskStatus};
+    task = {'completedDate' : new Date(), 'id' : taskId, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         addTaskToCompleted(taskId, function() { 
@@ -97,7 +99,7 @@ document.addEventListener('click', function() {
   } else if (event.target.matches('.stop')) {
     taskStatus = { 'completed' : false, 'paused' : false,
       'inProgress' : false, 'notStarted' : true };
-    task = {'_id' : taskId, status : taskStatus};
+    task = {'id' : taskId, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -105,14 +107,14 @@ document.addEventListener('click', function() {
         // TODO: notify user if there's and error and leave as is
       }
     });
-  } else if (event.target.matches('.undoCompletedTask')) {
+  } else if (event.target.matches('.undo-completed-task')) {
     // change the completed task status to inProgress and delete the newly 
     // created task. 
     taskStatus = { 'completed' : false, 'paused' : true, 
       'inProgress' : false, 'notStarted' : false };
-    task = { '_id' : taskId, status : taskStatus };
+    task = { 'id' : taskId, status : taskStatus };
     dataServices.updateTaskStatus(task, function() {
-      dataServices.deleteCompletedTask(taskId, function(err) {
+      dataServices.deleteAutoCreatedTask(taskId, function(err, task) {
         if(!err) {
           location.reload(true);
         } else {
@@ -121,8 +123,8 @@ document.addEventListener('click', function() {
       });
     });
   } else if (event.target.matches('.skip')) {
-    // Permanantely delete the instance of the task and create the next
-    // due task
+    // Create a new task based on the cadence of the current task. 
+    // Since the current task is being skipped it can be permanately deleted. 
     makeNewTask(taskId, function(err, newTask) {
       if(!err) {
         dataServices.deleteTask(taskId, function(err) {
@@ -147,11 +149,12 @@ document.addEventListener('click', function() {
         // TODO: notify user via flash or something else
       }
     });
-  } else if (event.target.matches('.deleteTaskIcon')) {
+  } else if (event.target.matches('.delete-task-icon')) {
+    console.log('delete me');
     // Change the task status to deleted and set the deleted date. 
     taskStatus = { 'completed' : false, 'paused' : false, 'inProgress' : false,
       'notStarted' : false, 'deleted' : true };
-    task = { '_id' : taskId, status : taskStatus, deletedDate : Date.now()};
+    task = { 'id' : taskId, status : taskStatus, deletedDate : new Date()};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -163,6 +166,8 @@ document.addEventListener('click', function() {
 });
 
 // make a new task object and return it to the callback.  
+// This is intended to be called when a task with a cadence is completed and 
+// a new task needs to be completed based on the cadence. 
 // takes a templateId as an argument and returns the new task to the callback
 // The templateId is, right now, the previously completed task
 var makeNewTask = function (templateId, callback) {
@@ -191,11 +196,9 @@ var makeNewTask = function (templateId, callback) {
       // the new task 
       var task = {
         dueDate : nextDueDate.toDate(),
-        createdDate : Date.now(),
+        createdDate : new Date(),
         title : template.title, 
         description : template.description,
-        overdue : false,
-        previousTaskId : template._id,
         status : {
           completed : false, 
           pause : false,
@@ -205,7 +208,8 @@ var makeNewTask = function (templateId, callback) {
         frequency : template.frequency,
         _category : template._category,
         _owner : template._owner,
-        _createdBy : template._createdBy
+        _createdBy : template._createdBy,
+        _previousTask : template.id
       };
       return callback('', task);
     } else {
@@ -238,8 +242,8 @@ var addTaskToCompleted = function (taskId, callback) {
   var taskItem = document.getElementById(taskId); 
   do {
     taskItem = taskItem.parentNode;
-  } while (!taskItem.matches('.taskItem')); 
-  document.getElementById('completedColumn').appendChild(taskItem);
+  } while (!taskItem.matches('.task-item')); 
+  document.getElementById('completed-column').appendChild(taskItem);
   return callback();
 };
 

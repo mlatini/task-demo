@@ -25,14 +25,18 @@
           </li>
         </ul>
       </div>
-      <div class="user-section">
-        <div class="nav-user">
-          <ul>
-            <li>
-              <a href="/profile" class="nav-link" id="profile">Profile</a>
-            </li>
-          </ul>
-        </div>
+      <div class="userSection">
+        {{#if loggedInUserFullName}}
+          <div class="navUser">
+            <div class="navLink" id="loggedInUserFullName">{{loggedInUserFullName}}  <i class="navUserDropdown fa fa-caret-down" id="navUserDropdown"></i></div>
+              <div class="navUserDropdownContent hidden" id="navUserDropdownContent">
+              <ul>
+                <li><a href="/profile" class="navLink">Profile</a></li>
+                <li><a href="/logout" class="navLink">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        {{/if}}
       </div>
     </div>
     {{{body}}}

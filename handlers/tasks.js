@@ -61,8 +61,9 @@ exports.tasks = (((req, res) => {
 
             var context = {
               notStartedTasks: notStartedTasks.map(((task) => {
-                let isOverdue = false;
-                let timeOverdue = '';
+                let isOverdue = false,
+                  timeOverdue = '';
+
                 if (moment(task.dueDate).isBefore()) {
                   isOverdue = true;
                   timeOverdue = moment(task.dueDate).fromNow(true);
@@ -80,7 +81,8 @@ exports.tasks = (((req, res) => {
                   overdue: isOverdue,
                   timeOverdue: timeOverdue,
                   status: task.status,
-                  frequency: task.frequency,
+                  frequencyTime : task.frequency.time || null,
+                  frequencyCadence : task.frequency.cadence || null,
                   category: task.category,
                   createdBy: task._createdBy,
                   tenant: task._tenant,
@@ -88,7 +90,7 @@ exports.tasks = (((req, res) => {
                   categoryName : task.category.name,
                   categoryBgHex : task.category.color.bgHex,
                   categoryFgHex : task.category.color.fgHex,
-                  owner : task.owner.name,  
+                  owner : task.owner.firstName + ' ' + task.owner.lastName,  
                   ownerFgHex : task.owner.color.fgHex,
                   ownerBgHex : task.owner.color.bgHex
                 };
@@ -113,7 +115,8 @@ exports.tasks = (((req, res) => {
                   overdue: isOverdue,
                   timeOverdue: timeOverdue,
                   status: task.status,
-                  frequency: task.frequency,
+                  frequencyTime : task.frequency.time || null,
+                  frequencyCadence : task.frequency.cadence || null,
                   category: task.category,
                   createdBy: task._createdBy,
                   tenant: task._tenant,
@@ -121,7 +124,7 @@ exports.tasks = (((req, res) => {
                   categoryName : task.category.name,
                   categoryBgHex : task.category.color.bgHex,
                   categoryFgHex : task.category.color.fgHex,
-                  owner : task.owner.name,  
+                  owner : task.owner.firstName + ' ' + task.owner.lastName,  
                   ownerFgHex : task.owner.color.fgHex,
                   ownerBgHex : task.owner.color.bgHex
                 };
@@ -146,7 +149,8 @@ exports.tasks = (((req, res) => {
                   overdue: isOverdue,
                   timeOverdue: timeOverdue,
                   status: task.status,
-                  frequency: task.frequency,
+                  frequencyTime : task.frequency.time || null,
+                  frequencyCadence : task.frequency.cadence || null,
                   category: task.category,
                   createdBy: task._createdBy,
                   tenant: task._tenant,
@@ -154,7 +158,7 @@ exports.tasks = (((req, res) => {
                   categoryName : task.category.name,
                   categoryBgHex : task.category.color.bgHex,
                   categoryFgHex : task.category.color.fgHex,
-                  owner : task.owner.name,  
+                  owner : task.owner.firstName + ' ' + task.owner.lastName,  
                   ownerFgHex : task.owner.color.fgHex,
                   ownerBgHex : task.owner.color.bgHex
                 };
@@ -168,10 +172,9 @@ exports.tasks = (((req, res) => {
                   deletedDate: task.deletedDate,
                   title: task.title,
                   description: task.description,
-                  overdue: isOverdue,
-                  timeOverdue: timeOverdue,
                   status: task.status,
-                  frequency: task.frequency,
+                  frequencyTime : task.frequency.time || null,
+                  frequencyCadence : task.frequency.cadence || null,
                   category: task.category,
                   createdBy: task._createdBy,
                   tenant: task._tenant,
@@ -179,7 +182,7 @@ exports.tasks = (((req, res) => {
                   categoryName : task.category.name,
                   categoryBgHex : task.category.color.bgHex,
                   categoryFgHex : task.category.color.fgHex,
-                  owner : task.owner.name,  
+                  owner : task.owner.firstName + ' ' + task.owner.lastName,  
                   ownerFgHex : task.owner.color.fgHex,
                   ownerBgHex : task.owner.color.bgHex
                 };
@@ -193,10 +196,9 @@ exports.tasks = (((req, res) => {
                   deletedDate: task.deletedDate,
                   title: task.title,
                   description: task.description,
-                  overdue: isOverdue,
-                  timeOverdue: timeOverdue,
                   status: task.status,
-                  frequency: task.frequency,
+                  frequencyTime : task.frequency.time || null,
+                  frequencyCadence : task.frequency.cadence || null,
                   category: task.category,
                   createdBy: task._createdBy,
                   tenant: task._tenant,
@@ -204,7 +206,7 @@ exports.tasks = (((req, res) => {
                   categoryName : task.category.name,
                   categoryBgHex : task.category.color.bgHex,
                   categoryFgHex : task.category.color.fgHex,
-                  owner : task.owner.name,  
+                  owner : task.owner.firstName + ' ' + task.owner.lastName,  
                   ownerFgHex : task.owner.color.fgHex,
                   ownerBgHex : task.owner.color.bgHex
                 };
