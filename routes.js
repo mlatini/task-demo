@@ -3,7 +3,9 @@ var api = require('./handlers/api');
 
 module.exports = ((app) => {
   // task
+  app.get('/', tasks.tasks);
   app.get('/tasks', tasks.tasks);
+  app.get('/task/edit/:id', tasks.editTaskGet);
 
   // api
   app.post('/api/settings/update', api.updateSettings);

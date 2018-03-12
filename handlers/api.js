@@ -40,7 +40,7 @@ exports.getTask = ((req, res) => {
 
   db.initialize(req.session.sessionId, (err) => {
     if(!err) {
-      db.getTaskById(taskId, (err, task) => {
+      db.getTaskById({ 'id': taskId }, (err, task) => {
         if(err) {
           res.send({ 'error': err, 'task': null });
         } else {

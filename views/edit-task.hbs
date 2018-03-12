@@ -1,0 +1,117 @@
+<h1>Edit Task</h1>
+<form action="/task/edit" method="post" class="add-task-form">
+  {{!Hidden fields to hold the chosen category from the dropdown}}
+  <input type="hidden" id="task-id" name="task-id" value="{{taskId}}">
+  <input type="hidden" id="owner-id" name="owner-id" value="{{ownerId}}">
+  <input type="hidden" id="category-iid" name="category-id" value="{{categoryId}}">
+
+  {{#if message}}
+    <div class="form-block">
+      <p class="error">{{message}}</p>
+    </div>
+  {{/if}}
+
+  <div class="form-block">
+    <label class="form-label" for="created-by">Created By: </label>
+    <input type="text" disabled id="created-by" value="{{createdBy}}">
+  </div>
+
+  <div class="form-block">
+    <label class="form-label" for="owner">Owner: </label>
+    <div class="dropdown"> 
+      <input class="dropdown-input" type="text" readonly id="owner" value="{{ownerFullName}}"><button id="owner-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
+      <div class="dropdown-content owner-dropdown-content" id="owner-dropdown-content">
+        {{#each people}}
+          {{#unless archived}}
+            <div data-id={{id}} data-owner="{{fullName}}" class="owner-option">
+              {{fullName}} 
+            </div> 
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-block">
+    <label class="form-label" for="category">Category: </label>
+    <div class="dropdown"> 
+      <input class="dropdown-input" type="text" readonly id="category" value="{{categoryName}}"><button id="category-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
+      <div class="dropdown-content category-dropdown-content" id="category-dropdown-content">
+        {{#each categories}}
+          {{#unless archived}}
+            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">
+              {{category}} 
+              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="color:{{colorBgHex}}" class="swatch fa fa-square"></label>
+            </div> 
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <div class="form-block">
+    <label class="form-label" for="due-date">Due Date: </label>
+    <input type="date" id="due-date" name="due-date" value="{{dateFormat dueDate "YYYY-MM-DD"}}">
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="recurring-check">Recurring: </label>
+    {{#if frequencyTime}}
+      <input type="checkbox" checked id="recurring-check" name="recurring-check" class="check">
+    {{else}}
+      <input type="checkbox" id="recurring-check" name="recurring-check" class="check">
+    {{/if}}
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="frequency">Frequency: </label>
+    {{#if frequencyTime}}
+      <input type="number" id="frequency" name="frequency" value="{{frequencyTime}}">
+      <select placeholder="select" id="frequency-cadence" name="frequency-cadence">
+    {{else}}
+      <input type="number" disabled id="frequency" name="frequency">
+      <select placeholder="select" id="frequency-cadence" name="frequency-cadence" disabled>
+    {{/if}}
+    {{#if cadenceMinute}}
+      <option selected>Minute</option>
+    {{else}}
+      <option>Minute</option>
+    {{/if}}
+    {{#if cadenceHour}}
+      <option selected>Hour</option>
+    {{else}}
+      <option>Hour</option>
+    {{/if}}
+    {{#if cadenceDay}}
+      <option selected >Day</option>
+    {{else}}
+      <option>Day</option>
+    {{/if}}
+    {{#if cadenceWeek}}
+      <option selected>Week</option>
+    {{else}}
+      <option>Week</option>
+    {{/if}}
+    {{#if cadenceMonth}}
+      <option selected>Month</option>
+    {{else}}
+      <option>Month</option>
+    {{/if}}
+    {{#if cadenceYear}}
+      <option selected>Year</option>
+    {{else}}
+      <option>Year</option>
+    {{/if}}
+    </select>
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="title">Title: </label>
+    <input type="text" id="title" name="title" value="{{title}}">
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="description">Description: </label>
+    <textarea id="description" name="description">{{description}}</textarea>
+  </div>
+  <div class="form-block">
+    <button type="submit" id="save-btn">Save Me!</button>
+    <button id="clear-btn">Cancel</button>
+  </div>
+</form>

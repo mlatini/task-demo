@@ -2,7 +2,8 @@ const express = require('express'),
   handlebars = require('express-handlebars'),
   cookieSession = require('cookie-session'),
   initialize = require('./src/server/initialize'),
-  bodyParser = require ('body-parser'); 
+  bodyParser = require ('body-parser'),
+  flash = require('connect-flash');
 
 const app = express();
 
@@ -23,6 +24,9 @@ app.use(cookieSession({
   keys: ['key1', 'key2'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+
+// Flash messages
+app.use(flash());
 
 // Initialize the session ID 
 app.use(initialize({

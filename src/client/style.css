@@ -385,5 +385,65 @@
   text-decoration: none;
 }
 
+.add-task-form {
+  margin: 0 auto;
+  width: 400px;
+  padding: 1em;
+  border: 1px solid;
+  border-radius: 1em;
+}
 
+.add-task-form input, textarea {
+  width: 200px;
+}
 
+/* for the div around each of 
+ * the form sections*/
+ .form-block {
+  margin-top: 1em;
+} 
+
+.error {
+  color: red;
+}
+
+.form-label {
+  display: inline-block;
+  width: 150px;
+  text-align: left;
+}
+
+.dropdown {
+  display: inline-block;
+}
+
+/* dropdown content. hidden by default */
+.new-color-content, .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.dropdown-input {
+  width: 178px;
+}
+
+.drop-arrow {
+  text-align: right;
+}
+
+/* highlight items inside the dropdown*/
+.color-option:hover, 
+.category-option:hover,
+.owner-option:hover,
+.created-by-option:hover
+{ 
+  background-color: #3e8e41;
+}
+
+.color-option, .category-option {
+  padding: .2em;
+}

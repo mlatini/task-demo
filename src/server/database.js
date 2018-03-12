@@ -9,7 +9,8 @@ const Task = require('../../models/task');
 const User = require('../../models/user');
 
 module.exports = function Database() {
- let tenantId = '';
+ let tenantId = '', 
+  file = '';
 
 
  this.initialize = function(id, callback) {
@@ -21,7 +22,7 @@ module.exports = function Database() {
     return callback('Database initialization failed due to invalid id');
   } else {
     tenantId = id;
-    const file = 'store/' + tenantId + '.json';
+    file = 'store/' + tenantId + '.json';
     jsonfile.readFile(file, (err, object) => {
       if(err || !object) {
         Seed(( (err) => {
@@ -239,7 +240,6 @@ module.exports = function Database() {
     newDataStore.colors.push(pink);
 
     // Push the new items to the store
-    const file = 'store/' + tenantId + '.json';
     jsonfile.writeFile(file, newDataStore, (err) => {
       if(err) {
         return callback('error in Seed function' + err);
@@ -257,8 +257,7 @@ module.exports = function Database() {
     // Returns an object with the tasks and any sub-items or an empty object
     // 
     const populateOwner = options.populateOwner || null,
-    populateCategory = options.populateCategory || null, 
-    file = 'store/' + tenantId + '.json';
+    populateCategory = options.populateCategory || null;
     
     let users = new HashTable(),
     categories = new HashTable(),
@@ -310,10 +309,19 @@ module.exports = function Database() {
   };
 
   // Get a task from the database by id. 
-  // callback(err, task)
-  this.getTaskById = function(id, callback) {
-    const file = 'store/' + tenantId + '.json', 
-      taskId = id || null;
+  // Args:
+  // options: 
+  //  id: taskId
+  //  populateCreatedBy: bool
+  //  populateOwner: bool
+  //  populateCategory: bool
+  //  callback(err, task)
+  this.getTaskById = function(options, callback) {
+
+    const taskId = options.id || null,
+      populateCreatedBy = options.populateCreatedBy || null,
+      populateOwner = options.populateOwner || null,
+      populateCategory = options.populateCategory || null;
 
     let returnTask = null;
 
@@ -324,6 +332,36 @@ module.exports = function Database() {
         for(let i = 0, max = db.tasks.length; i < max; i += 1) {
           if(db.tasks[i].id === taskId) {
             returnTask = db.tasks[i];
+            if(populateCreatedBy) {
+              let temp = null;
+              for(let i = 0, max = db.users.length; i < max; i += 1) {
+                if(returnTask._createdBy === db.users[i].id) {
+                  temp = db.users[i];
+                  returnTask._createdBy = temp;
+                  break;
+                }
+              }
+            }
+            if(populateOwner) {
+              let temp = null;
+              for(let i = 0, max = db.users.length; i < max; i += 1) {
+                if(returnTask._owner === db.users[i].id) {
+                  temp = db.users[i];
+                  returnTask._owner = temp;
+                  break;
+                }
+              }
+            }
+            if(populateCategory) {
+              let temp = null;
+              for(let i = 0, max = db.categories.length; i < max; i += 1) {
+                if(returnTask._category === db.categories[i].id) {
+                  temp = db.categories[i];
+                  returnTask._category = temp;
+                  break
+                }
+              }
+            }
             break;
           }
         }
@@ -337,8 +375,7 @@ module.exports = function Database() {
   };
 
   this.getTaskByPreviousTaskId = function(id, callback) {
-    const file = 'store/' + tenantId + '.json', 
-      taskId = id || null;
+    const taskId = id || null;
 
     let returnTask = null;
 
@@ -367,8 +404,7 @@ module.exports = function Database() {
   //  callback(err, task)
   // Returns the newly saved task to the callback. 
   this.saveNewTask = function(task, callback) {
-    const file = 'store/' + tenantId + '.json', 
-      newTask = task || null;
+    const newTask = task || null;
 
     jsonfile.readFile(file, (err, db) => {
       if(err) {
@@ -400,11 +436,9 @@ module.exports = function Database() {
   //  id: task to delete
   //  callback(err, deletedTask(deep copy of task) )
   this.deleteTask = function(id, callback){
-    const file = 'store/' + tenantId + '.json',
-      taskId = id || null;
+    const taskId = id || null;
      
-    let error = null,
-      taskToReturn = null;
+    let taskToReturn = null;
 
     jsonfile.readFile(file, (err, db) => {
       if(err) {
@@ -436,8 +470,6 @@ module.exports = function Database() {
   //  Task object
   //  callback(err, task)
   this.updateTaskStatus = function(task, callback) {
-    const file = 'store/' + tenantId + '.json';
-
     let updatedTask = task || null, 
       taskToUpdate = {};
 
@@ -474,8 +506,6 @@ module.exports = function Database() {
   };
   
   this.getSettings = function(callback) {
-    const file = 'store/' + tenantId + '.json';
-
     jsonfile.readFile(file, (err, object) => {
       if(err) {
         return callback(err, null);
@@ -485,6 +515,9 @@ module.exports = function Database() {
     });
   };
 
+
+  // Get a specific user by id
+
   // update the settings. Will either update the schedules, categories
   // or admin depending on what is passed into the function. Note that
   // it can update all of them on a single call.
@@ -492,7 +525,6 @@ module.exports = function Database() {
   //  Settings Object
   //  Callback(err, settings)
   this.updateSettings = function(settings, callback) {
-    const file = 'store/' + tenantId + '.json';
     jsonfile.readFile(file, (err, db) => {
       if(settings.tasks) {
         if(settings.tasks.showCompletedTasks !== null) {
@@ -519,6 +551,51 @@ module.exports = function Database() {
           return callback(null, db.settings);
         }
       });
+    });
+  };
+
+  this.getAllUsers = function(options, callback) {
+    // args:
+    //  options: not used yet. Here for future expansion so I don't have
+    //    change the interface if  want to expand the query options. 
+    //  callback(err, users)
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback('No users returned', null);
+      } else {
+        return callback(null, db.users);
+      }
+    });
+  };
+
+  this.getCategories = function(options, callback) {
+    // args:
+    //  options:
+    //    populateColor: bool
+    //    callback(err, categories)
+
+    const populateColor = options.populateColor || null;
+
+    let categoriesToReturn = [], 
+      colors = new HashTable();
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback('No categories returned', null);
+      } else {
+        categoriesToReturn = db.categories;
+        if(populateColor) {
+          for(let i = 0, max = db.colors.length; i < max; i += 1) {
+            colors.put(db.colors[i].id, db.colors[i]);
+          }
+          for(let i = 0, max = categoriesToReturn.length; i < max; i += 1) {
+            let colorTemp = colors.get(categoriesToReturn[i]._color);
+            // Every category has a color so not necessary to validate
+            categoriesToReturn[i]._color = colorTemp;
+          }
+        }
+      return callback(null, categoriesToReturn);
+      }
     });
   };
 };
