@@ -12,6 +12,9 @@ module.exports = function Database() {
  let tenantId = '', 
   file = '';
 
+this.getCurrentTenantId = function() {
+  return tenantId;
+};
 
  this.initialize = function(id, callback) {
   // If the filestore doesn't exist, create
@@ -144,7 +147,7 @@ module.exports = function Database() {
     newTask3.createdDate = new Date();
     newTask3.title = 'Recurring Task';
     newTask3.description = 'Recurring tasks will auto-create a new follow-up ' +
-      ' task when completed. Try completing this task to see how that works.'
+      ' task when completed. Try completing this task to see how that works.';
     newTask3.status = {
       completed: false,
       paused: false,
@@ -290,7 +293,7 @@ module.exports = function Database() {
 
         // Populate the owner and category objects of each task, if 
         // options.populateCategory and/or options.populateOwner
-        for(let i = 0, max = db.tasks.length; i < max; i +=1) {
+        for(let i = 0, max = db.tasks.length; i < max; i += 1) {
           if(populateOwner) {
             let owner = users.get(db.tasks[i]._owner);
             owner.color = colors.get(owner._color);
@@ -304,7 +307,7 @@ module.exports = function Database() {
         }
       }
       // Good to go, return the tasks.  
-      return callback(null, db.tasks);
+      return callback(null, JSON.parse(JSON.stringify(db.tasks)));
     });
   };
 
@@ -358,7 +361,7 @@ module.exports = function Database() {
                 if(returnTask._category === db.categories[i].id) {
                   temp = db.categories[i];
                   returnTask._category = temp;
-                  break
+                  break;
                 }
               }
             }
@@ -366,7 +369,7 @@ module.exports = function Database() {
           }
         }
         if(returnTask) {
-          return callback(null, returnTask);
+          return callback(null, JSON.parse(JSON.stringify(returnTask)));
         } else {
           return callback('Task not found', null);
         }
@@ -390,7 +393,7 @@ module.exports = function Database() {
           }
         }
         if(returnTask) {
-          return callback(null, returnTask);
+          return callback(null, JSON.parse(JSON.stringify(returnTask)));
         } else {
           return callback('Task not found', null);
         }
@@ -415,7 +418,7 @@ module.exports = function Database() {
           db.tasks.push(newTask);
           jsonfile.writeFile(file, db, (err) => {
             if(!err) {
-              return callback(null, newTask);
+              return callback(null, JSON.parse(JSON.stringify(newTask)));
             } else {
               return callback('err', null);
             }
@@ -423,6 +426,58 @@ module.exports = function Database() {
         }
       } 
       return('Unable to save new task', null);
+    });
+  };
+
+  // Save a new category to the database. 
+  // args: 
+  //  category: a category object
+  //  callback(err, category)
+  // Returns the newly saved category to the callback. 
+  this.saveNewCategory = function(category, callback) {
+    const newCategory = category || null, 
+      categoryToSave = {};
+    
+    // Validate the new category and populate categoryToSave before 
+    // pushing it to db.categories. 
+    if(!newCategory) {
+      return callback('The new category is null');
+    }
+
+    if(!newCategory.name) {
+      return callback('The new category is missing a name');
+    } else {
+      categoryToSave.name = newCategory.name;
+    }
+
+    categoryToSave.archived = newCategory.archived || false;
+    
+    if(!newCategory._color) {
+      return callback('The new category is missing the color');
+    } else {
+      categoryToSave._color = newCategory._color;
+    }
+
+    if(!newCategory._tasksWithCategory) {
+      categoryToSave._tasksWithCategory = [];
+    }
+
+    categoryToSave.id = uuidv1();
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+          db.categories.push(categoryToSave);
+          jsonfile.writeFile(file, db, (err) => {
+            if(!err) {
+              return callback, null, JSON.parse(JSON.stringify(newCategory));
+            } else {
+              return callback(err, null);
+            }
+          });
+      }
+      return('Unable to save new category', null);
     });
   };
 
@@ -454,7 +509,7 @@ module.exports = function Database() {
                 if(err) {
                   return callback(err, null);
                 } else {
-                  return callback(null, taskToReturn);
+                  return callback(null, JSON.parse(JSON.stringify(taskToReturn)));
                 }
               });
             break;
@@ -465,37 +520,81 @@ module.exports = function Database() {
     });
   };
 
-  // Update the task status. 
-  // Arguments:
-  //  Task object
-  //  callback(err, task)
-  this.updateTaskStatus = function(task, callback) {
-    let updatedTask = task || null, 
-      taskToUpdate = {};
 
+  // Update task. This will take a task as an input and update it in the 
+  // database.
+  //
+  // Args:
+  //  id: number
+  //  task: task object
+  //  callback(err, task) - returns the updated task.
+  this.findTaskByIdAndUpdate = function(id, task, callback) {
+    const updatedTaskId = id || null,
+      updatedTask = task || null;
+    
+    let existingTaskToUpdate = null;
+    
     jsonfile.readFile(file, (err, db) => {
       if(err) {
         return callback(err, null);
       } else {
         for(let i = 0, max = db.tasks.length; i < max; i += 1) {
-          if(db.tasks[i].id === updatedTask.id) {
-            taskToUpdate = db.tasks[i];
+          if(db.tasks[i].id === updatedTaskId) {
+            existingTaskToUpdate = db.tasks[i];
             break;
           }
-        }
-        if(taskToUpdate) {
-          taskToUpdate.status.completed = updatedTask.status.completed || false;
-          taskToUpdate.status.paused = updatedTask.status.paused || false;
-          taskToUpdate.status.inProgress = updatedTask.status.inProgress || false;
-          taskToUpdate.status.notStarted = updatedTask.status.notStarted || false;
-          taskToUpdate.status.deleted = updatedTask.status.deleted || false;
-          taskToUpdate.completedDate = updatedTask.completedDate || '';
-          taskToUpdate.deletedDate = updatedTask.deletedDate || '';
+        }     
+        if(existingTaskToUpdate) {
+          // Make sure only to update fields that have a value in
+          // updatedTask. Other fields will remain as-is. 
+          if(updatedTask.dueDate) { 
+            existingTaskToUpdate.dueDate = updatedTask.dueDate; 
+          }
+          if(updatedTask.completedDate) {
+            existingTaskToUpdate.completedDate = updatedTask.completedDate;
+          }
+          if(updatedTask.deletedDate) {
+            existingTaskToUpdate.deletedDate = updatedTask.deletedDate;
+          }
+          if(updatedTask.title) {
+            existingTaskToUpdate.title = updatedTask.title;
+          }
+          if(updatedTask.description) {
+            existingTaskToUpdate.description = updatedTask.description;
+          }
+          if(updatedTask.status) {
+            existingTaskToUpdate.status.completed = 
+              updatedTask.status.completed || null;
+            existingTaskToUpdate.status.paused = 
+              updatedTask.status.paused || null;
+            existingTaskToUpdate.status.inProgress =
+              updatedTask.status.inProgress || null;
+            existingTaskToUpdate.status.notStarted =
+              updatedTask.status.notStarted || null;
+            existingTaskToUpdate.status.deleted =
+              updatedTask.status.deleted || null;
+          }
+          if(updatedTask.frequency) {
+              // Created frequency property in case it doesn't exist so I 
+              // can assign properties to it. 
+              existingTaskToUpdate.frequency = {};
+              existingTaskToUpdate.frequency.time = updatedTask.frequency.time;
+              existingTaskToUpdate.frequency.cadence = updatedTask.frequency.cadence;
+          }
+          if(updatedTask._category) {
+            existingTaskToUpdate._category = updatedTask._category;
+          }
+          if(updatedTask._owner) {
+            existingTaskToUpdate._owner = updatedTask._owner;
+          }
+          if(updatedTask._previousTask) {
+            existingTaskToUpdate._previousTask = updatedTask._previousTask;
+          }
           jsonfile.writeFile(file, db, (err) => {
             if(err) {
-              return callback(err, null);
+              return callback('Error updating the task', null);
             } else {
-              return callback(null, taskToUpdate);
+              return callback(null, JSON.parse(JSON.stringify(existingTaskToUpdate)));
             }
           });
         } else {
@@ -504,13 +603,137 @@ module.exports = function Database() {
       }
     });
   };
+
+  // Push a task to a user's ownedTasks
+  // options : {
+  //  userId,
+  //  taskId
+  //  callback(err)
+  this.pushTaskToUserOwnedTasks = function(options, callback) {
+    const userId = options.userId || null,
+      taskId = options.taskId || null;
+
+    let userToUpdate = null, 
+      ownedTaskExists = false;
+
+    // Make sure a valid options object was passed in before continuing.
+    if(!userId) {
+      return callback('Empty userId');
+    } else if(!taskId) {
+      return callback('Empty taskId');
+    } else {
+      // Valid options so continue
+
+      jsonfile.readFile(file, (err, db) => {
+        if(err) {
+          return callback(err);
+        } else {
+          // Parse the users and find the right one. 
+          for(let i = 0, max = db.users.length; i < max; i += 1) {
+            if(db.users[i].id === userId) {
+              userToUpdate = db.users[i];
+              break;
+            }
+          }
+          // userId not found so return error. 
+          if(!userToUpdate) {
+            return callback('userId not found');
+          } else {
+          // If 0 ownedTasks just push it and return the callback;
+            if(userToUpdate._ownedTasks.length <= 0) {
+              userToUpdate._ownedTasks.push(taskId);
+              return callback(null);
+            } else {
+              // if >= 1 ownedTasks, make sure new taskId is unique. 
+              for(let i = 0, max = userToUpdate._ownedTasks.length; 
+                i < max; i += 1) {
+                  if(userToUpdate._ownedTasks[i] === taskId) {
+                    ownedTaskExists = true;
+                    break;
+                  }
+              }
+              // taskId not in _ownedTasks so push it and return.
+              if(!ownedTaskExists) {
+                userToUpdate._ownedTasks.push(taskId);
+                jsonfile.writeFile(file, db, (err) => {
+                  if(err) {
+                    return callback('Unable to save updated _ownedTasks');
+                  } else {
+                    return callback(null);
+                  }
+                });
+              }
+            }
+          }
+        }
+      });
+    }
+  };
+
+  // Remove a task from a user's ownedTasks
+  // options : {
+  //  userId,
+  //  taskId
+  this.removeTaskFromUserOwnedTasks = function(options, callback) {
+    const userId = options.userId || null,
+      taskId = options.taskId || null;
+
+    let userToUpdate = null;
+
+    // Make sure a valid options object was passed in before continuing.
+    if(!userId) {
+      return callback('Empty userId');
+    } else if(!taskId) {
+      return callback('Empty taskId');
+    } else {
+      // Valid options so continue
+      jsonfile.readFile(file, (err, db) => {
+        if(err) {
+          return callback(err);
+        } else {
+          // Parse the users and find the right one. 
+          for(let i = 0, max = db.users.length; i < max; i += 1) {
+            if(db.users[i].id === userId) {
+              userToUpdate = db.users[i];
+              break;
+            }
+          }
+          // userId not found so return error. 
+          if(!userToUpdate) {
+            return callback('userId not found');
+            // If _ownedTasks contains taskId delete it, update the file store.
+            // and return callback with a null error. 
+            // If _ownedTasks doesn't contain taskId return callback with error. 
+          } else {
+            let index = userToUpdate.ownedTasks.findIndex((ownedTask) => {
+              return options.taskId.equals(ownedTask);
+            });
+            if(index > -1) {
+              userToUpdate.ownedTasks.splice(index, 1);
+              jsonfile.writeFile(file, db, (err) => {
+                if(!err) {
+                  return callback(null);
+                } else {
+                  return callback('Unable to save updated _ownedTasks');
+                }
+              });
+            } else {
+              const error = 'Unable to find the taskId' + taskId + 
+                ' in user._ownedTasks';
+              return callback(error);
+            }
+          }
+        }
+      });
+    }
+  };
   
   this.getSettings = function(callback) {
     jsonfile.readFile(file, (err, object) => {
       if(err) {
         return callback(err, null);
       } else {
-        return callback(null, object.settings);
+        return callback(null, JSON.parse(JSON.stringify(object.settings)));
       }
     });
   };
@@ -548,7 +771,7 @@ module.exports = function Database() {
         if(err) {
           return callback(err, null);
         } else {
-          return callback(null, db.settings);
+          return callback(null, JSON.parse(JSON.stringify(db.settings)));
         }
       });
     });
@@ -563,21 +786,64 @@ module.exports = function Database() {
       if(err) {
         return callback('No users returned', null);
       } else {
-        return callback(null, db.users);
+        return callback(null, JSON.parse(JSON.stringify(db.users)));
       }
     });
   };
 
-  this.getCategories = function(options, callback) {
+  this.getAllColors = function(options, callback) {
+    // args:
+    //  options: not used yet. Here for future expansion so I don't have 
+    //    to change th interface if I want to add options. 
+    //  callback(err, colors)
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback('No colors returned', null);
+      } else {
+        return callback(null, JSON.parse(JSON.stringify(db.colors)));
+      }
+    });
+  };
+
+  this.getCategoryById = function(id, callback) {
+    // Find a single category by Id and return it to the callback. 
+    // args:
+    //  id
+    //  callback(err, category);
+    const categoryId = id || null;
+
+    let categoryToReturn = null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback('Error reading database');
+      } else {
+        for(let i = 0, max = db.categories.length; i < max; i += 1) {
+          if(db.categories[i].id === categoryId) {
+            categoryToReturn = db.categories[i];
+            break;
+          } 
+        }
+        if(categoryToReturn) {
+          return callback(null, JSON.parse(JSON.stringify(categoryToReturn)));
+        }
+      }
+    });
+  };
+
+  this.getAllCategories = function(options, callback) {
     // args:
     //  options:
     //    populateColor: bool
+    //    populateTasksWithCategory: bool
     //    callback(err, categories)
 
-    const populateColor = options.populateColor || null;
+    const populateColor = options.populateColor || null, 
+      populateTasksWithCategory = options.populateTasksWithCategory || null;
 
     let categoriesToReturn = [], 
-      colors = new HashTable();
+      colors = new HashTable(),
+      tasks = new HashTable();
 
     jsonfile.readFile(file, (err, db) => {
       if(err) {
@@ -594,7 +860,79 @@ module.exports = function Database() {
             categoriesToReturn[i]._color = colorTemp;
           }
         }
-      return callback(null, categoriesToReturn);
+        if(populateTasksWithCategory) {
+          for(let i = 0, max = db.tasks.length; i < max; i += 1) {
+            tasks.put(db.tasks[i].id, db.tasks[i]);
+          }
+          categoriesToReturn.forEach( (categoryToReturn) => {
+            let tasksWithCategory = [];
+              if(categoryToReturn._tasksWithCategory.length >= 1) {
+                categoryToReturn._tasksWithCategory.forEach( (taskWithCategory) => {
+                  tasksWithCategory.push(tasks.get(taskWithCategory));
+                });
+              }
+            categoryToReturn._tasksWithCategory = tasksWithCategory;
+          });
+        }
+      return callback(null, JSON.parse(JSON.stringify(categoriesToReturn)));
+      }
+    });
+  };
+
+  // Update category. This will take a category as an input and update it 
+  // in the database. 
+  //
+  // Args:
+  //  id: number
+  //  category: category object
+  //  callback(err, category) - returns the updated category.
+  this.findCategoryByIdAndUpdate = function(id, category, callback) {
+    const updatedCategoryId = id || null,
+      updatedCategory = category || null;
+
+    let existingCategoryToUpdate = null;
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback('Unable to open database', null);
+      } else {
+        for(let i = 0, max = db.categories.length; i < max; i += 1) {
+          if(db.categories[i].id === updatedCategoryId) {
+            existingCategoryToUpdate = db.categories[i];
+            break;
+          }
+        }
+        if(existingCategoryToUpdate !== null) {
+          // Make sure to only update fields that have a value in
+          // updatedCategory. Other fields will remain as-is. 
+          if(updatedCategory.name !== null && 
+            updatedCategory.name !== undefined) {
+              existingCategoryToUpdate.name = updatedCategory.name;
+          }
+          if(updatedCategory.archived !== null && 
+            updatedCategory.archived !== undefined) {
+              existingCategoryToUpdate.archived = updatedCategory.archived;
+          }
+          if(updatedCategory._color !== null && 
+            updatedCategory._color !== undefined) {
+              existingCategoryToUpdate._color = updatedCategory._color;
+          }
+          if(updatedCategory._tasksWithCategory !== null && 
+            updatedCategory._tasksWithCategory !== undefined) {
+              existingCategoryToUpdate._tasksWithCategory = 
+                updatedCategory._tasksWithCategory;
+          }
+          jsonfile.writeFile(file, db, (err, db) => {
+            if(err) {
+              return callback('error when writing category to database');
+            } else {
+              return callback(null, JSON.parse(JSON.stringify(
+                existingCategoryToUpdate)));
+            }
+          });
+        } else {
+          return callback('Unable to find category to update in database', null);
+        }
       }
     });
   };

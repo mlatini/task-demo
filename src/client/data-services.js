@@ -43,12 +43,22 @@ exports.updateTaskStatus = function(task, callback) {
   xhttp.send(JSON.stringify({ 'task': task }));
 };
 
-
-
-
-
-
-
+// Call /api/user/get-all-users to get all the users. 
+// callback(err, users)
+exports.getAllUsers = function(callback) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(this.readyState === 4 && this.status === 200) {
+      if(JSON.parse(this.responseText).users.length >= 1) {
+        return callback(null, JSON.parse(this.responseText).users);
+      } else {
+        return callback('ERR: no users returned', null);
+      }
+    }
+  };
+  xhttp.open('GET', '/api/user/get-all-users', true);
+  xhttp.send();
+};
 
 
 
@@ -69,7 +79,7 @@ exports.getColors = function(callback) {
       }
     }
   };
-  xhttp.open('GET', '/colors', true);
+  xhttp.open('GET', '/api/get-all-colors', true);
   xhttp.send();
 };
 
@@ -95,9 +105,9 @@ exports.getColor = function(colorName, callback) {
 // return an error if the save is not successful
 exports.postCategory = function(category, callback) {
   var xhttp = new XMLHttpRequest();
-  xhttp.open('POST', '/new-category', true);
+  xhttp.open('POST', '/api/category/save-new', true);
   xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify(category));
+  xhttp.send(JSON.stringify( { 'category': category }));
   // TODO: check for error response from post and return to the
   // calling function if it's present. 
   return callback('');
@@ -135,12 +145,12 @@ exports.updateUser = function(options, callback) {
     return callback({ 
       'msg' : 'A user object was not passed to exports.updateUser in ' +
       'data-services'
-    }, null)
+    }, null);
   } else if(!options.roles) {
     return callback({
       'msg' : 'A role array was not passed to exports.updateUser in ' +
       'data-services'
-    }, null)
+    }, null);
   } else {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -254,7 +264,7 @@ exports.updateCategory = function(category, callback) {
       }
     }
   };
-  var url = '/api/category/update';
+  var url = '/api/category/update/';
   xhttp.open('POST', url, true);
   xhttp.setRequestHeader('Content-type', 'application/json');
   xhttp.send(JSON.stringify(category));
@@ -289,7 +299,7 @@ exports.unArchiveCategory = function(id, callback) {
       }
     }
   };
-  var url = '/api/category/unArchive/' + id;
+  var url = '/api/category/un-archive/' + id;
   xhttp.open('POST', url, true);
   xhttp.send();
 }; 

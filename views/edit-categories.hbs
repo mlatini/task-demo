@@ -1,0 +1,126 @@
+<h1>Edit Categories</h1>
+<div class="grid-container">
+  <div class="grid-header">
+    <div class="grid-item-left">
+      <label>Number of Active Categories: {{activeCategoryCount}}</label>
+    </div>
+    <div class="grid-item-middle">
+      <label for="show-archived-check">Show Archived Categories</label>
+      {{#if showArchived}}
+        <input type="checkbox" checked id="show-archived-check" name="show-archived-check">
+      {{else}}
+        <input type="checkbox" id="show-archived-check" name="show-archived-check">
+      {{/if}}
+    </div>
+    <div class="grid-item-right">
+      <button id="new-category-button" class="btn btn-primary pull-right">New Category</button>
+    </div>
+  </div>
+
+  <div id="new-category-row" class="new-category-row grid-row hidden">
+    <div class="grid-item">
+      <div class="grid-item-left">
+        {{! This will hold the selected-color-id each time the user clicks on a color from the dropdown}}
+        <input type="hidden" id="selected-color-id">
+        <input type="hidden" id="selected-bg-hex">
+        <input type="hidden" id="selected-fg-hex">
+        <input type="hidden" id="selected-color-name">
+        <p id="new-category-error" class="error"></p>
+        {{! These are the fields that will be shown when the user clicks on the "newCategory" button"}}
+        <input type="text" class="new-category-input" id="new-category-input" placeholder="new category name">
+        <div class="new-category-dropdown" id="new-category-dropdown"> 
+          <label class="new-color-label" id="new-color-label"></label>
+          <label class="new-color-name" id="new-color-name"></label>
+          <i class="new-color-dropdown-caret fa fa-caret-down"></i> 
+          <div class="new-color-content hidden" id="new-color-content"></div> 
+        </div>
+      </div>
+      <div class="grid-item-middle"></div>
+      <div class="grid-item-right">
+        <button class="btn btn-primary" id="create-category-button">Add Me!</button>
+        <button class="btn btn-primary" id="cancel-create-category-button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  {{! The active category section}}
+  <h3>Active Categories</h3>    
+  {{#each categories}}
+    {{#unless archived}}
+      <div class="grid-row">
+        <div class="grid-item">
+          <div class="grid-item-left">
+            {{! Hidden text to hold the colorId and bghex of the selected color in the dropdown. This will be used to save to the db}}
+            <input type="hidden" id="selected-color-id{{id}}" value="{{colorId}}">
+            <input type="hidden" id="selected-bg-hex{{id}}" value="{{colorBgHex}}">
+            <input type="hidden" id="selected-fg-hex{{id}}" value="{{colorFgHex}}">
+            <input type="hidden" id="selected-color-name{{id}}" value="{{colorName}}">
+            <input type="hidden" id="selected-category-name{{id}}" value="{{name}}">
+
+            {{! Hidden fields to hold the current state of the colors. This should be equivalent to what's in the database}}
+            <input type="hidden" id="current-color-id{{id}}" value="{{colorId}}">
+            <input type="hidden" id="current-bg-hex{{id}}" value="{{colorBgHex}}">
+            <input type="hidden" id="current-fg-hex{{id}}" value="{{colorFgHex}}">
+            <input type="hidden" id="current-color-name{{id}}" value="{{colorName}}">
+            <input type="hidden" id="current-category-name{{id}}" value="{{name}}">
+            
+            <p id="edit-category-error" class="error"></p>
+            {{! This is the fields that will be shown when the user clicks on the "edit" link on the right side. Hidden by default}}
+            <input type="text" id="edit-category-input{{id}}" name="edit-category-input" class="hidden category-input">
+            <div class="edit-color-dropdown hidden" id="edit-color-dropdown{{id}}" data-categoryid="{{id}}">
+              <label id="edit-color-label{{id}}" class="edit-color-label" data-categoryid="{{id}}"></label>
+              <label id="edit-color-name{{id}}" class="edit-color-name" data-categoryid="{{id}}">{{colorName}}</label>
+              <i class="edit-color-dropdown-caret fa fa-caret-down" data-categoryid="{{id}}"></i> 
+              <div class="edit-color-content hidden" id="edit-color-content{{id}}"></div> {{! This is the container for the color dropdown}}
+            </div>
+            {{! End of the 'edit' link fields}} 
+            <label id="category-label{{id}}" class="category-label" style="background-color:{{colorBgHex}}; color:{{colorFgHex}}">{{name}}</label>
+          </div>
+
+          <div class="grid-item-middle">
+            <div class="category-count">{{activeTasksWithCategory}} active tasks with category</div>
+          </div>
+          <div class="grid-item-right">
+            <div id="edit-category-link{{id}}" class="edit-section show-inline"><a href="#" class="edit-category-link" data-id="{{id}}">Edit</a></div>
+            <div id="archive-category-link{{id}}" class="edit-section show-inline"><a href="#" class="archive-category-link" data-id="{{id}}">Archive</a></div>
+            <button id="save-category-edit{{id}}" class="btn btn-primary save-category-edit hidden" data-id="{{id}}" data-color="{{colorId}}">Save</button>
+            <button id="cancel-category-edit{{id}}" class="btn btn-primary cancel-category-edit hidden" data-id="{{id}}" data-color="{{colorId}}" >Cancel</button>
+          </div>
+        </div>
+       </div>
+     {{/unless}}
+  {{/each}}
+
+{{! The archived categories section }}
+{{#if showArchived}}
+  <div class="show" id="archived-categories">
+{{else}}
+  <div class="hidden" id="archived-categories">
+{{/if}}
+    <div class="grid-header">
+      <div class="grid-item-left">
+        <label>Number of Archived Categories: {{archivedCategoryCount}}</label>
+      </div>
+    </div>
+    <h3>Archived Categories</h3>
+    {{#each categories}}
+      {{#if archived}}
+        <div class="grid-row">
+          <div class="grid-item">
+            <div class="grid-item-left">
+              <label class="category-label" style="background-color:{{colorBgHex}}; color:{{colorFgHex}}">{{name}}</label>
+            </div>
+            <div class="grid-item-middle">
+              <div class="category-count">{{activeTasksWithCategory}} active tasks with category</div>
+            </div>
+            <div class="grid-item-right">
+              <div class="edit-section"><a href="#" class="unarchive-category-link" data-id="{{id}}">Un-Archive</a></div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</div>
+      
+<script src="/editCategoriesBundle.js"></script>

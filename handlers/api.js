@@ -21,13 +21,72 @@ exports.updateTaskStatus = ((req, res) => {
 
   db.initialize(req.session.sessionId, (err) => {
     if(!err) {
-      db.updateTaskStatus(req.body.task, (err, task) => {
+      db.findTaskByIdAndUpdate(req.body.task.id, req.body.task, (err, task) => {
         if(err) {
           res.send({ 'error': err, 'task': null });
         } else {
           res.send({ 'error': null, 'task': task});
         }
       });
+    }
+  });
+});
+
+exports.updateCategory = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      db.findCategoryByIdAndUpdate(req.body.category.id, req.body.category, 
+        (err, category) => {
+          if(err) {
+            res.send({ 'error': err, 'category': null });
+          } else {
+            res.send({ 'error': null, 'category': category });
+          }
+      });
+    }
+  });
+});
+
+exports.getAllUsers = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(err) {
+      res.send({ 'error': err, 'users': null });
+    } else {
+      db.getAllUsers({}, (err, users) => {
+        if(err) {
+          res.send({ 'error': err, 'users': null });
+        } else {
+          res.send({ 'error': null, 'users': users });
+        }
+      });
+    }
+  });
+});
+
+exports.getAllColors = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(err) {
+      res.send({ 'error': err, 'colors': null });
+    } else {
+      db.getAllColors({}, (err, colors) => {
+        if(err) {
+          res.send({ 'error': err, 'colors': null });
+        } else {
+          res.send({ 'error': null, 'colors': colors });
+        }
+      })
     }
   });
 });
@@ -60,9 +119,67 @@ exports.saveNewTask = ((req, res) => {
     if(!err) {
       db.saveNewTask(req.body.task, (err, task) => {
         if(err) {
-          res.send({ 'error': null, 'task': task });
-        } else {
           res.send({ 'error': err, 'task': null });
+        } else {
+          res.send({ 'error': null, 'task': task });
+        }
+      });
+    }
+  });
+});
+
+exports.saveNewCategory = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      db.saveNewCategory(req.body.category, (err, category) => {
+        if(err) {
+          res.send({ 'error': err, 'category': null });
+        } else {
+          res.send({ 'error': null, 'category': category });
+        }
+      });
+    }
+  });
+});
+
+exports.archiveCategory = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database(), 
+    archivedCategory = {};
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      archivedCategory.archived = true;
+      db.findCategoryByIdAndUpdate(req.params.id, archivedCategory, (err) => {
+        if(err) {
+          res.send({ 'error': err });
+        } else {
+          res.send({ 'error': null });
+        }
+      });
+    }
+  });
+});
+
+exports.unArchiveCategory = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database(), 
+    unArchivedCategory = {};
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      unArchivedCategory.archived = false;
+      db.findCategoryByIdAndUpdate(req.params.id, unArchivedCategory, (err) => {
+        if(err) {
+          res.send({ 'error': err });
+        } else {
+          res.send({ 'error': null });
         }
       });
     }

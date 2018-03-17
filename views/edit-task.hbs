@@ -1,9 +1,9 @@
 <h1>Edit Task</h1>
-<form action="/task/edit" method="post" class="add-task-form">
+<form class="add-task-form" action="/task/edit" method="post" >
   {{!Hidden fields to hold the chosen category from the dropdown}}
   <input type="hidden" id="task-id" name="task-id" value="{{taskId}}">
   <input type="hidden" id="owner-id" name="owner-id" value="{{ownerId}}">
-  <input type="hidden" id="category-iid" name="category-id" value="{{categoryId}}">
+  <input type="hidden" id="category-id" name="category-id" value="{{categoryId}}">
 
   {{#if message}}
     <div class="form-block">
@@ -20,7 +20,7 @@
     <label class="form-label" for="owner">Owner: </label>
     <div class="dropdown"> 
       <input class="dropdown-input" type="text" readonly id="owner" value="{{ownerFullName}}"><button id="owner-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
-      <div class="dropdown-content owner-dropdown-content" id="owner-dropdown-content">
+      <div class="dropdown-content owner-dropdown-content hidden" id="owner-dropdown-content">
         {{#each people}}
           {{#unless archived}}
             <div data-id={{id}} data-owner="{{fullName}}" class="owner-option">
@@ -36,11 +36,10 @@
     <label class="form-label" for="category">Category: </label>
     <div class="dropdown"> 
       <input class="dropdown-input" type="text" readonly id="category" value="{{categoryName}}"><button id="category-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
-      <div class="dropdown-content category-dropdown-content" id="category-dropdown-content">
+      <div class="dropdown-content category-dropdown-content hidden" id="category-dropdown-content">
         {{#each categories}}
           {{#unless archived}}
-            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">
-              {{category}} 
+            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">{{category}}
               <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="color:{{colorBgHex}}" class="swatch fa fa-square"></label>
             </div> 
           {{/unless}}
@@ -115,3 +114,4 @@
     <button id="clear-btn">Cancel</button>
   </div>
 </form>
+<script src="/editTaskBundle.js"></script>

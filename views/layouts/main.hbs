@@ -3,6 +3,7 @@
 <html>
   <head>
     <title>Task Scheduler</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font-awesome/css/font-awesome.min.css">
   </head>
   <body>
     <div class="top-menu">
@@ -25,21 +26,19 @@
           </li>
         </ul>
       </div>
-      <div class="userSection">
-        {{#if loggedInUserFullName}}
-          <div class="navUser">
-            <div class="navLink" id="loggedInUserFullName">{{loggedInUserFullName}}  <i class="navUserDropdown fa fa-caret-down" id="navUserDropdown"></i></div>
-              <div class="navUserDropdownContent hidden" id="navUserDropdownContent">
-              <ul>
-                <li><a href="/profile" class="navLink">Profile</a></li>
-                <li><a href="/logout" class="navLink">Logout</a></li>
-              </ul>
-            </div>
+      <div class="user-section">
+        <div class="nav-user">
+          <div class="nav-link" id="logged-in-user-full-name">{{loggedInUserFullName}}  <i class="nav-user-dropdown fa fa-caret-down" id="nav-user-dropdown"></i></div>
+            <div class="nav-user-dropdown-content hidden" id="nav-user-dropdown-content">
+            <ul id="users-list">
+              {{!-- <li><a href="/profile" class="nav-link">Profile</a></li>
+              <li><a href="/logout" class="nav-link">Logout</a></li> --}}
+            </ul>
           </div>
-        {{/if}}
+        </div>
       </div>
     </div>
     {{{body}}}
-    <script type="javascript" src="main.js"></script>
+    <script src="/mainBundle.js"></script>
   </body>
 </html>

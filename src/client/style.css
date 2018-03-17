@@ -1,3 +1,30 @@
+body {
+  background-color:  #c8c3cc;
+}
+
+h1 {
+margin-top: 32px;
+text-align: center;
+}
+
+h3 {
+text-align: center;
+}
+
+.pull-right {
+float: right;
+margin-right: 0;
+}
+
+.pull-left {
+float : left;
+margin-left: 0;
+}
+
+.error {
+color: red;
+}
+
 .nav-link {
   display: block;
   text-align: center;
@@ -13,6 +40,18 @@
   background-color: #0000ff;
   color: #ffffff;
   cursor: pointer;
+}
+
+.hidden {
+  display: none
+}
+
+.show {
+  display: block;
+}
+
+.show-inline {
+  display:inline-block;
 }
 
 .active-page-link {
@@ -295,11 +334,6 @@
   font-size: 12px;
 }
 
-.pull-right {
-  float: right;
-  margin-right: 0;
-}
-
 .task-item-description {
   font-size: 14px;
   margin-bottom: .50em;
@@ -403,10 +437,6 @@
   margin-top: 1em;
 } 
 
-.error {
-  color: red;
-}
-
 .form-label {
   display: inline-block;
   width: 150px;
@@ -419,7 +449,7 @@
 
 /* dropdown content. hidden by default */
 .new-color-content, .dropdown-content {
-  display: none;
+  /* display: none; */
   position: absolute;
   background-color: #f9f9f9;
   min-width: 200px;
@@ -446,4 +476,177 @@
 
 .color-option, .category-option {
   padding: .2em;
+}
+
+
+.grid-container {
+  border-top-style: solid;
+  border-left-style: solid;
+  border-right-style: solid;
+  border-color: #d9d9d9;
+  border-width: thin;
+}
+
+.grid-header {
+  background-color: #dddddd;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.grid-item-left {
+  display: inline-block;
+  width: 33%;
+  vertical-align: middle;
+}
+
+.grid-item-middle {
+  display: inline-block;
+  width: 33%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.grid-item-right {
+  display: inline-block;
+  width: 33%;
+  padding-right: 1px;
+  vertical-align: middle;
+  text-align: right;
+}
+
+.btn {
+  font-size: 14px;
+  top: 5em;
+  bottom: 5em;
+  padding: 6px 12px;
+}
+
+.btn, .smallBtn{
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+  background-color: #6cc644;
+}
+
+.btn-primary {
+  background-image: linear-gradient(#91dd70, #55ae2e);
+  border: 1px solid #5aad35;
+}
+
+.new-category-row {
+}
+
+.grid-row {
+  border-bottom-style: solid;
+  border-bottom-color: #d9d9d9;
+  border-width: thin;
+}
+
+.grid-item {
+  display: block;
+  /*width: 60%;*/
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.new-category-input, .new-User-input {
+  font-size: 16px;
+  padding: .50em;
+  display: inline-block;
+}
+
+.category-input {
+  font-size: 16px;
+  padding: .50em;
+}
+
+.new-category-dropdown {
+  display: inline-block;
+}
+
+.new-category-dropdown,
+.new-user-color-dropdown,
+.edit-color-dropdown,
+.edit-user-color-dropdown{
+  border-style: solid;
+  border-width: thin;
+  border-color: white;
+  padding: 5px;
+}
+
+.edit-color-dropdown:hover,
+.edit-color-label:hover,
+.edit-color-name:hover,
+.edit-color-dropdown-caret:hover,
+.new-category-dropdown:hover,
+.new-color-label:hover,
+.new-color-name:hover,
+.new-color-dropdown-caret:hover {
+  cursor: pointer;
+}
+
+.edit-color-label, .new-color-label {
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.edit-color-content, .new-color-content,
+ .dropdown-content {
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+
+.edit-color-Name, .new-color-name {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.edit-color-option:hover, 
+.edit-color-swatch:hover,
+.edit-color-swatch-name:hover,
+.new-color-swatch:hover,
+.new-color-swatch-name:hover,
+.new-color-option:hover {
+  background-color:#5b8e3e;
+  cursor: pointer;
+}
+
+.swatch {
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  vertical-align: middle;
+  border-style: solid;
+  border-width: thin;
+  border-color: gray;
+}
+
+.category-label {
+  font-size: 18px;
+  padding: .50em;
+  box-shadow: 0 -4px -8px 0 rgba(0,0,0,0.2);
+  border-radius: .2em;
+  margin-left: .25em;
+}
+
+.category-count {
+  display: inline-block;
+  width: 50%;
+}
+
+.edit-section {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-right: 10px;
+  text-align: right;
 }
