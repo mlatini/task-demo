@@ -1,0 +1,79 @@
+<h1>Add a New Task</h1>
+<form action="/add-task" method="post" class="add-task-form">
+  {{!Hidden fields to hold the chosen category from the dropdown}}
+  <!--<input type="hidden" id="createdById" name="createdById">}}-->
+  <input type="hidden" id="owner-id" name="owner-id" value="{{loggedInUserId}}">
+  <input type="hidden" id="category-id" name="category-id">
+
+  {{#if message}}
+    <div class="form-block">
+      <p class="error">{{message}}</p>
+    </div>
+  {{/if}}
+  <div class="form-block">
+    <label class="form-label" for="owner">Assigned: </label>
+    <div class="dropdown"> 
+      <input class="dropdown-input" type="text" readonly id="owner" value="{{loggedInUserFullName}}"><button id="owner-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
+      <div class="dropdown-content owner-dropdown-content hidden" id="owner-dropdown-content">
+        {{#each users}}
+          {{#unless archived}}
+            <div data-id={{id}} data-owner="{{fullName}}" class="owner-option">
+              {{fullName}} 
+            </div> 
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  
+  <div class="form-block">
+    <label class="form-label" for="category">Category: </label>
+    <div class="dropdown"> 
+      <input class="dropdown-input" type="text" readonly id="category" placeholder="Choose One Yo"><button id="category-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
+      <div class="dropdown-content category-dropdown-content hidden" id="category-dropdown-content">
+        {{#each categories}}
+          {{#unless archived}}
+            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">
+              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="background-color:{{colorBgHex}}" class="swatch new-color-swatch"></label>
+              {{category}} 
+            </div> 
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <div class="form-block">
+    <label class="form-label" for="dueDate">Due Date: </label>
+    <input type="date" id="due-date" name="due-date" value="{{dateFormat currentDateTime "YYYY-MM-DD"}}">
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="recurringCheck">Recurring: </label>
+    <input type="checkbox" id="recurring-check" name="recurring-check" class="check">
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="frequency">Frequency: </label>
+    <input type="number" id="frequency" name="frequency" disabled>
+    <select placeholder="select" id="frequency-cadence" name="frequency-cadence" disabled>
+      <option>Minute</option>
+      <option>Hour</option>
+      <option>Day</option>
+      <option>Week</option>
+      <option>Month</option>
+      <option>Year</option>
+    </select>
+  </div>
+  <div class="form-block">
+    <label class="form-label" for="title">Title: </label>
+    <input type="text" id="title" name="title">
+  </div>
+  <div class="form-block">
+    <label "form-label" for="description">Description: </label>
+    <textarea id="description" name="description"></textarea>
+  </div>
+  <div class="form-block">
+    <button type="submit" id="save-btn">Save Me!</button>
+    <button type="reset" id="clear-btn">Reset Form</button>
+  </div>
+</form>
+<script src="/addTaskBundle.js"></script>

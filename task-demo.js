@@ -1,7 +1,9 @@
-const express = require('express');
-const handlebars = require('express-handlebars');
-const cookieSession = require('cookie-session');
-const initialize = require('./src/server/initialize');
+const express = require('express'),
+  handlebars = require('express-handlebars'),
+  cookieSession = require('cookie-session'),
+  initialize = require('./src/server/initialize'),
+  bodyParser = require ('body-parser'),
+  flash = require('connect-flash');
 
 const app = express();
 
@@ -15,6 +17,7 @@ app.engine('.hbs', handlebars({
 app.set('view engine', '.hbs');
 
 app.use(express.static(__dirname + '/dist'));
+app.use(express.static(__dirname + '/public'));
 
 app.use(cookieSession({
   name: 'session',
@@ -22,10 +25,19 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
+// Flash messages
+app.use(flash());
+
 // Initialize the session ID 
 app.use(initialize({
 
 }));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
    // The routes
 require('./routes.js')(app); 

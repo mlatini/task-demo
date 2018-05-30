@@ -3,20 +3,6 @@ window.onload = function () {
   document.getElementById('add-task-link').classList.toggle('active-page-link');
 };
 
-// Show the createdby dropdown when the user clicks on 'created by' dropdown 
-/*
-document.getElementById('createdByDropBtn').onclick = function() {
-  document.getElementById('createdByDropdownContent').classList.toggle('show');
-};
-*/
-
-// show the createdby dropdown when the user clicks on 'created by' input
-/*
-document.getElementById('createdBy').onclick = function() {
-  document.getElementById('createdByDropdownContent').classList.toggle('show');
-};
-*/
-
 // Show the owner dropdown when the user clicks on 'choose owner' dropdown
 document.getElementById('owner-drop-btn').onclick = function() {
   document.getElementById('owner-dropdown-content').classList.toggle('show');
@@ -51,12 +37,10 @@ var processOwnerClick = function(target) {
   document.getElementById('owner').value = target.dataset.owner;
 };
 
-/*
 var processCreatedByClick = function(target) {
-  document.getElementById('createdById').value = target.dataset.id;
-  document.getElementById('createdBy').value = target.dataset.createdby;
+  document.getElementById('created-by-id').value = target.dataset.id;
+  document.getElementById('created-by').value = target.dataset.createdby;
 };
-*/
 
 document.getElementById('recurring-check').onclick = function() {
   var check = document.getElementById('recurring-check');
@@ -77,13 +61,12 @@ document.getElementById('recurring-check').onclick = function() {
 
 // Process clicks on the various dropdowns on the form
 document.addEventListener('click', function() {
-  console.log(event.target);
   if (event.target.matches('.category-option') || event.target.matches('.swatch')) {
     processCategoryClick(event.target);
   } else if (event.target.matches('.owner-option')) {
     processOwnerClick(event.target);
-  //} else if (event.target.matches('.createdByOption')) {
-   // processCreatedByClick(event.target);
+  } else if (event.target.matches('.created-by-option')) {
+    processCreatedByClick(event.target);
   } 
 });
 
@@ -91,6 +74,7 @@ document.addEventListener('click', function() {
 // TODO: change this to a functional style this is from w3 schools 
 //  and it's TERRIBLE
 window.onclick = function(event) {
+  console.log(event.target);
   if (!event.target.matches('.drop-btn') && !event.target.matches('.drop-arrow')
         && !event.target.matches('.dropdown-input')) {
     var dropdowns = document.getElementsByClassName('dropdown-content');
@@ -103,5 +87,3 @@ window.onclick = function(event) {
     }
   } 
 };
-
-

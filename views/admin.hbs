@@ -1,0 +1,195 @@
+<h1>Admin Page</h1>
+
+{{! Header }}
+<div class="grid-container">
+  <div class="grid-header">
+    <div class="grid-item-left">
+      <label>Number of Active Users: {{activeUsersCount}}</label>
+    </div>
+    <div class="grid-item-middle">
+      <label for="show-archived-users-check">Show Archived Users</label>
+      {{#if showArchivedUsers}}
+        <input type="checkbox" checked id="show-archived-users-check" name="show-archived-users-check">
+      {{else}}
+        <input type="checkbox" id="show-archived-users-check" name="show-archived-users-check">
+      {{/if}}
+    </div>
+    <div class="grid-item-right">
+      <button id="new-user-button" class="btn btn-primary pull-right">New User</button>
+    </div>
+  </div>
+
+  {{! This is where a new user will be entered. Hidden by deault }}
+  <div id="new-user-row" class="new-user-row grid-row hidden">
+    <div class="grid-item">
+      {{! holds the selected-color-id each time the user clicks on a color from the dropdown}}
+      <input type="hidden" id="selected-color-id">
+      <input type="hidden" id="selected-bg-hex">
+      <input type="hidden" id="selected-fg-hex">
+      <input type="hidden" id="selected-color-name">
+
+      <p class="error" id="new-user-error"></p>
+      {{! Shown when the user clicks on the "newUser" button }}
+      <input class="new-user-input" id="new-user-first-name" placeholder="First Name">
+      <input class="new-user-input" id="new-user-last-name" placeholder="Last Name">
+      <input class="new-user-input" id="new-user-username" placeholder="Username">
+      <input class="new-user-input" type="password" id="new-user-password" placeholder="Password">
+      <input class="new-user-input" id="new-user-email" placeholder="Email">
+      <div class="new-user-color-dropdown" id="new-user-color-dropdown">
+        <label class="new-color-label"id="new-color-label"></label>
+        <label class="new-color-name"id="new-color-name"></label>
+        <div class="new-color-content hidden" id="new-color-content"></div> 
+      </div>
+      <label for="new-user-admin">Admin Role</label>
+      <input type="checkbox" id="new-user-admin" name="new-user-admin"> 
+      <button class="btn btn-primary" id="create-user-button">Add Me!</button> <button class="btn btn-primary" id="cancel-create-user-button">Cancel</button>
+    </div>
+  </div>
+
+  {{! The active users section }}
+  <h3>Active Users</h3>
+  {{#each users}}
+    {{#unless archived}}
+      {{! This is the fields that will be shown when the user clicks "edit" on the right. Hidden by default}}
+
+      {{! holds the selected-color-id each time the user clicks on a color from the dropdown}}
+      <input type="hidden" id="selected-color-id{{id}}">
+      <input type="hidden" id="selected-bg-hex{{id}}" value="{{bgHex}}">
+      <input type="hidden" id="selected-fg-hex{{id}}" value="{{fgHex}}">
+      <input type="hidden" id="selected-color-name{{id}}" value="{{colorName}}">
+
+      {{! Used to determine if the user is already in the admin or user group when saving}}
+      <input type="hidden" id="is-admin{{id}}" value="{{isAdmin}}">
+      <input type="hidden" id="is-user{{id}}" value="{{isUser}}">
+
+      <div class="grid-row hidden" id="edit-grid-row{{id}}">
+        <div class="grid-item">
+          <p class="error"id="edit-user-error{{id}}"></p>
+          <div class="admin-form-block"> 
+            <label class="admin-form-label" for="edit-user-first-name{{id}}">First Name</label>
+            <input class="admin-form-input new-user-input" type="text" id="edit-user-first-name{{id}}" name="edit-user-first-name{{id}}">
+          </div>
+          <div class="admin-form-block">
+            <label class="admin-form-label" for="edit-user-last-name{{id}}">Last Name</label>
+            <input class="admin-form-input new-user-input" id="edit-user-last-name{{id}}">
+          </div>
+          <div class="admin-form-block">
+            <label class="admin-form-label" for="edit-user-username{{id}}">Username</label>
+            <input class="new-user-input" id="edit-user-username{{id}}">
+          </div>
+          <div class="admin-form-block">
+            <label class="admin-form-label" for="edit-user-email{{id}}">Email</label>
+            <input class="new-user-input" id="edit-user-email{{id}}">
+          </div>
+          <div class="edit-user-color-dropdown" id="edit-user-color-dropdown{{id}}">
+            <label class="edit-color-label" id="edit-color-label{{id}}" data-id="{{id}}"></label>
+            <label class="edit-color-name"id="edit-color-name{{id}}"></label>
+            <div class="edit-color-content" id="edit-color-content{{id}}"></div> 
+          </div>
+          <label for="edit-user-admin">Admin Role</label>
+          {{#if isAdmin}}
+            <input type="checkbox" checked id="edit-user-admin{{id}}" name="edit-user-admin"> 
+          {{else}}
+            <input type="checkbox" id="edit-user-admin{{id}}" name="edit-user-admin"> 
+          {{/if}}
+          <label for="edit-user-user">User Role</label>
+          {{#if isUser}}
+            <input type="checkbox" checked id="edit-user-user{{id}}" name="edit-user-user"> 
+          {{else}}
+            <input type="checkbox" id="edit-user-user{{id}}" name="edit-user-user"> 
+          {{/if}}
+          <button class="btn btn-primary save-edited-user-button" id="save-edited-user-button{{id}}" data-id="{{id}}">Save Me!</button> <button class="btn btn-primary cancel-edited-user-button" id="cancel-edited-user-button{{id}}" data-id="{{id}}">Cancel</button>
+        </div>
+      </div>
+            
+      <div class="grid-row" id="current-grid-row{{id}}">
+        <div class="grid-item">
+          <div class="grid-item-left">
+            {{! These fields will display the list of current users.}}
+            <label id="full-name{{id}}">{{fullName}}</label>
+            <label id="email{{id}}">{{email}}</label>
+            <label id="username{{id}}">{{username}}</label>
+            {{#each roles}}
+              <label id="roles{{id}}" class="roles-list-label">{{name}}</label>
+            {{/each}}
+
+            {{! Hidden text to hold the updated state of the fields. This will be used to save to the db}}
+            <input type="hidden" id="updated-first-name{{id}}" value="{{firstName}}">
+            <input type="hidden" id="updated-last-name{{id}}" value="{{lastName}}">
+            <input type="hidden" id="updated-full-name{{id}}" value="{{fullName}}">
+            <input type="hidden" id="updated-email{{id}}" value="{{email}}">
+            <input type="hidden" id="updated-username{{id}}" value"{{username}}">
+            <input type="hidden" id="updated-bg-hex{{id}}" value="{{bgHex}}">
+            <input type="hidden" id="updated-fg-hex{{id}}" value="{{fgHex}}">
+
+            {{! Hidden fields to hold the current state of the fields. This should be equivalent to what's in the database}}
+            <input type="hidden" id="current-first-name{{id}}" value="{{firstName}}">
+            <input type="hidden" id="current-last-name{{id}}" value="{{lastName}}"> 
+            <input type="hidden" id="current-full-name{{id}}" value="{{fullName}}">
+            <input type="hidden" id="current-email{{id}}" value="{{email}}">
+            <input type="hidden" id="current-username{{id}}" value="{{username}}">
+            <input type="hidden" id="current-bg-hex{{id}}" value="{{bgHex}}">
+            <input type="hidden" id="current-fg-hex{{id}}" value="{{fgHex}}">
+            <input type="hidden" id="current-color-name{{id}}" value="{{colorName}}">
+          </div>
+
+          <div class="grid-item-middle" id="grid-item-middle{{id}}">
+            {{#if activeTasks}}
+              <div class="user-task-count">{{activeTasks}} Active Tasks</div>
+            {{else}}
+              <div class="user-task-count">0 Active Tasks</div>
+            {{/if}}
+          </div>
+
+          <div class="grid-item-right">
+            <div class="edit-section show-inline"id="edit-user-link{{id}}"><a href="#" class="edit-user-link" data-id="{{id}}">Edit</a></div>
+            <div class="edit-section show-inline"id="archive-user-link{{id}}"><a class="archive-user-link" href="#" data-id="{{id}}">Archive</a></div>
+            <button class="btn btn-primary hidden" id="create-user-button" data-id="{{id}}">Save</button>
+            <button class="btn btn-primary hidden" id="cancel-create-user-button" data-id="{{id}}">Cancel</button>
+          </div>
+        </div> 
+      </div>
+    {{/unless}}
+  {{/each}}
+
+  {{! Archived users section }}
+  {{#if showArchivedUsers}}
+    <div class="show" id="archived-users">
+  {{else}}
+    <div class="hidden" id="archived-users">
+  {{/if}}
+  <div class="grid-header">
+    <div class="grid-item-left">
+      <label>Number of Archived Users: {{archivedUsersCount}}</label>
+    </div>
+  </div>
+    <h3>Archived Users</h3>
+    {{#each users}}
+      {{#if archived}}
+        <div class="grid-row" id="current-grid-row{{id}}">
+          <div class="grid-item">
+            <div class="grid-item-left">
+              {{! These fields will display the list of current users.}}
+              <label id="full-name{{id}}">{{fullName}}</label>
+              <label id="email{{id}}">{{email}}</label>
+              <label id="username{{id}}">{{username}}</label>
+              {{#each roles}}
+                <label id="roles{{id}}" class="roles-list-label">{{name}}</label>
+              {{/each}}
+            </div>
+
+            <div class="grid-item-middle" id="grid-item-middle{{id}}">
+              <div class="user-task-count">{{activeTasks}} Active Tasks</div>
+            </div>
+
+            <div class="grid-item-right">
+              <div id="unarchive-user-link{{id}}" class="edit-section show-inline"><a class="unarchive-user-link" href="#" data-id="{{id}}">Un-Archive</a></div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</div>
+         
+<script src="/adminBundle.js"></script>

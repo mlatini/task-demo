@@ -1,6 +1,7 @@
 module.exports = function User() {
     this.id = '';
-    this.name = '';
+    this.firstName;
+    this.lastName;
     this._color = '';
     this._settings = '';
     this._roles = [];

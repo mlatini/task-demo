@@ -3,6 +3,7 @@
 <html>
   <head>
     <title>Task Scheduler</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font-awesome/css/font-awesome.min.css">
   </head>
   <body>
     <div class="top-menu">
@@ -20,21 +21,24 @@
           <li>
             <a href="/edit-categories" class="nav-link" id="edit-categories">Edit Categories</a>
           </li>
-          <li>
+{{!--           <li>
             <a href="/admin" class="nav-link" id="admin">Admin</a>
-          </li>
+          </li> --}}
         </ul>
       </div>
       <div class="user-section">
         <div class="nav-user">
-          <ul>
-            <li>
-              <a href="/profile" class="nav-link" id="profile">Profile</a>
-            </li>
-          </ul>
+          <div class="nav-link" id="logged-in-user-full-name">{{loggedInUserFullName}}  <i class="nav-user-dropdown fa fa-caret-down" id="nav-user-dropdown"></i></div>
+            <div class="nav-user-dropdown-content hidden" id="nav-user-dropdown-content">
+            <ul id="users-list">
+              {{!-- <li><a href="/profile" class="nav-link">Profile</a></li>
+              <li><a href="/logout" class="nav-link">Logout</a></li> --}}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
     {{{body}}}
+    <script src="/mainBundle.js"></script>
   </body>
 </html>

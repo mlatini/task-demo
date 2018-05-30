@@ -18,7 +18,16 @@ module.exports = function Task() {
     this.frequency = '';
     // frequency : {
     //   time : Number,
+    //    An integer that determines the number of periods of the cadence 
+    //      below. IE: time of 5 and cadence of 'days' would be every 5 days.
     //   cadence : String
+    ///   valid options are:
+    //    'Minute'
+    //    'Hour'
+    //    'Day'
+    //    'Week'
+    //    'Month'
+    //    'Year'
     // }
 
     // These properties are UUID's of other objects. 
