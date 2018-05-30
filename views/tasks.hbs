@@ -74,14 +74,14 @@
             </div>
             <div class="task-item-icons">
               <div class="status-buttons">
-                <label class="start-btn start" data-id="{{id}}"><i class="fa fa-play start" data-id="{{id}}"></i></label>
-                <label class="pause-btn pause" data-id="{{id}}"><i class="fa fa-pause pause" data-id="{{id}}"></i></label>
-                <label class="complete-btn complete" data-id="{{id}}"><i class="fa fa-check complete" data-id="{{id}}"></i></label>
-                <label class="skip-btn skip" data-id="{{id}}"><i class="fa fa-step-forward skip" data-id="{{id}}"></i></label>
+                <label class="start-btn start tooltip" data-id="{{id}}"><span class="tooltip-text">Start Task</span><i class="fa fa-play start" data-id="{{id}}"></i></label>
+                <label class="pause-btn pause tooltip" data-id="{{id}}"><span class="tooltip-text">Pause Task</span><i class="fa fa-pause pause" data-id="{{id}}"></i></label>
+                <label class="complete-btn complete tooltip" data-id="{{id}}"><span class="tooltip-text">Complete Task</span><i class="fa fa-check complete" data-id="{{id}}"></i></label>
+                <label class="skip-btn skip tooltip" data-id="{{id}}"><span class="tooltip-text">Skip Task</span><i class="fa fa-step-forward skip" data-id="{{id}}"></i></label>
               </div>
               <div class="edit-buttons">
-                <label class="delete-btn"><i class="fa fa-trash-o delete-task-icon" data-id="{{id}}"></i></label>
-                <label class="edit-btn"><a href="/task/edit/{{id}}"><i class="fa fa-pencil"></i></a></label>
+                <label class="delete-btn tooltip"><span class="tooltip-text">Delete Task</span><i class="fa fa-trash-o delete-task-icon" data-id="{{id}}"></i></label>
+                <label class="edit-btn tooltip"><a href="/task/edit/{{id}}"><span class="tooltip-text">Edit Task</span><i class="fa fa-pencil"></i></a></label>
               </div>
             </div>
         </div>
