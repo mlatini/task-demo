@@ -20,6 +20,7 @@ exports.editTaskGet = function (req, res) {
     } else {
       db.getTaskById({ 'id': taskId, 'populateCreatedBy': true, 'populateOwner': true, 'populateCategory': true }, (err, task) => {
         db.getAllUsers({}, (err, users) => {
+          console.log('users', users)
           db.getAllCategories({ 'populateColor': true }, (err, categories) => {
             // Find the frequency cadence to pass to the view which will be used to
             // choose the 'selected' option in the cadence dropdown
@@ -49,7 +50,7 @@ exports.editTaskGet = function (req, res) {
             }
             var context = {
               message: req.flash('error'),
-              loggedInUserFullName : req.user.firstName + ' ' +
+              loggedInUserFullName: req.user.firstName + ' ' +
                 req.user.lastName,
               taskId: task.id,
               dueDate: task.dueDate,
@@ -103,37 +104,37 @@ exports.editTaskGet = function (req, res) {
   });
 };
 
-exports.addTaskGet = function(req, res) {
+exports.addTaskGet = function (req, res) {
   const sessionId = req.session.sessionId ? req.session.sessionId : null,
     db = new Database();
 
   db.initialize(sessionId, (err) => {
-    if(err) {
+    if (err) {
       res.status(500).json({ 'error': err });
     } else {
       db.getAllCategories({ 'populateColor': true }, (err, categories) => {
         db.getAllUsers({}, (err, users) => {
           var context = {
-            message : req.flash('error'),
-            loggedInUserId : req.user.id,
-             loggedInUserFullName : req.user.firstName + ' ' +
-               req.user.lastName,
-            currentDateTime : moment(),
-            categories : categories.map(function(category) {
+            message: req.flash('error'),
+            loggedInUserId: req.user.id,
+            loggedInUserFullName: req.user.firstName + ' ' +
+              req.user.lastName,
+            currentDateTime: moment(),
+            categories: categories.map(function (category) {
               return {
-                id : category.id,
-                category : category.name,
-                colorName : category._color.name,
-                colorBgHex : category._color.bgHex,
-                colorFgHex : category._color.fgHex,
-                archived : category.archived
+                id: category.id,
+                category: category.name,
+                colorName: category._color.name,
+                colorBgHex: category._color.bgHex,
+                colorFgHex: category._color.fgHex,
+                archived: category.archived
               };
             }),
-            users : users.map(function(user) {
+            users: users.map(function (user) {
               return {
-                id : user.id,
-                fullName : user.firstName + ' ' + user.lastName,
-                archived : user.archived
+                id: user.id,
+                fullName: user.firstName + ' ' + user.lastName,
+                archived: user.archived
               };
             })
           };
@@ -144,81 +145,81 @@ exports.addTaskGet = function(req, res) {
       });
     }
   });
-    
+
 };
 
-exports.addTaskPost = function(req, res) {
+exports.addTaskPost = function (req, res) {
   const db = new Database();
 
   db.initialize(req.session.sessionId, (err) => {
-    if(err) {
+    if (err) {
       res.status(500).json({ 'error': err });
     } else {
       // Validate the user input
-      if(!req.body['owner-id']) {
+      if (!req.body['owner-id']) {
         req.flash('error', 'The task needs an owner');
         return res.redirect(303, '/add-task');
       }
-      if(!req.body['category-id']) {
+      if (!req.body['category-id']) {
         req.flash('error', 'There\'s no category');
         return res.redirect(303, '/add-task');
       }
-      if(!req.body['due-date']) {
+      if (!req.body['due-date']) {
         res.render('/add-task');
         return res.redirect(303, '/add-task');
       }
-      if(!req.body.title) {
+      if (!req.body.title) {
         req.flash('error', 'A task without a title isn\'t very useful');
         return res.redirect(303, '/add-task');
       }
     }
   });
-  
+
   var newTask = {
-    dueDate : moment(req.body.dueDate),
-    createdDate : moment(),
-    title : req.body.title,
-    description : req.body.description,
+    dueDate: moment(req.body.dueDate),
+    createdDate: moment(),
+    title: req.body.title,
+    description: req.body.description,
     status: {
-      completed : false,
-      paused : false,
-      inProgress : false,
-      notStarted : true
+      completed: false,
+      paused: false,
+      inProgress: false,
+      notStarted: true
     },
-    frequency : {
-      time : req.body.frequency,
-      cadence : req.body['frequency-cadence']
+    frequency: {
+      time: req.body.frequency,
+      cadence: req.body['frequency-cadence']
     },
-    _category : req.body['category-id'],
-    _owner : req.body['owner-id'],
-    _createdBy : req.user.id,
+    _category: req.body['category-id'],
+    _owner: req.body['owner-id'],
+    _createdBy: req.user.id,
   };
 
   db.saveNewTask(newTask, (err, task) => {
-    if(err) {
+    if (err) {
       res.status(500).json({ 'error': err });
       req.session.flash = {
-        type : 'danger',
-        intro : 'wooahhh pardner!',
-        message : 'huge error coming your way!',
+        type: 'danger',
+        intro: 'wooahhh pardner!',
+        message: 'huge error coming your way!',
       };
       return res.redirect(303, '/add-task');
     } else {
       req.session.flash = {
         type: 'success',
-        intro : 'grats!',
-        message : 'you have added a new task',
+        intro: 'grats!',
+        message: 'you have added a new task',
       };
       // Push the taskId to user.ownedTasks
       db.pushTaskToUserOwnedTasks({
-        'userId' : req.user.id, 
-        'taskId' : task.id
-      }, function(err) {
+        'userId': task._owner,
+        'taskId': task.id
+      }, function (err) {
         // Update tasksWithCategory in the category model. 
         db.getCategoryById(req.body['category-id'], (err, category) => {
-          category._tasksWithCategory.push( task.id);
+          category._tasksWithCategory.push(task.id);
           db.findCategoryByIdAndUpdate(category.id, category, (err, category) => {
-            if(err) {
+            if (err) {
               //TODO: if this fails I need to rollback the saved task and notify
               //the user (flash) because the database will be inconsistent if
               //this doesn't complete. I need to read more about err in mongoose
@@ -236,7 +237,7 @@ exports.addTaskPost = function(req, res) {
 // edit task post handler
 exports.editTaskPost = function (req, res) {
   const taskId = req.body['task-id'] || null,
-    owner = req.body['owner-id'] || null, 
+    owner = req.body['owner-id'] || null,
     category = req.body['category-id'] || null,
     dueDate = new moment(req.body['due-date']) || null,
     title = req.body.title || null,
@@ -297,45 +298,43 @@ exports.editTaskPost = function (req, res) {
         } else {
           // If the task owner has changed update userOwnedTasks in the old
           // and new owner.
-          if (oldTask._owner !== updatedTask._owner) {
-            db.pushTaskToUserOwnedTasks({
-              'userId': updatedTask._owner,
-              'taskId': oldTask.id
-            }, function (err) { });
-            db.removeTaskFromUserOwnedTasks({
-              'userId': oldTask._owner,
-              'taskId': oldTask.id
-            }, function (err) { });
-          }
-          // If the category has changed update tasksWithCategory in the 
-          // old and new categories
-          if (oldTask._category !== category) {
-            db.getCategoryById(oldTask._category, (err, oldCategory) => {
-              db.getCategoryById(category, (err, newCategory) => {
-                var index = -1;
-                if (!err && oldCategory) {
-                  index = oldCategory._tasksWithCategory.findIndex(function (element) {
-                    return element === oldTask.id;
-                  });
-                  if (index >= 0) {
-                    oldCategory._tasksWithCategory.splice(index, 1);
-                    newCategory._tasksWithCategory.push(oldTask.id);
-                    db.findCategoryByIdAndUpdate(
-                      oldCategory.id, oldCategory, (err) => {
-                      if (!err) {
-                        db.findCategoryByIdAndUpdate(
-                          newCategory.id, newCategory, (err) => {
-                          if (!err) {
-                            return res.redirect(303, '/tasks');
-                          } else {
-                            console.log('Error ' + err);
-                          }
+          if (oldTask._owner !== updatedTask._owner) { 
+            db.pushTaskToUserOwnedTasks({ 'userId': updatedTask._owner, 'taskId': oldTask.id }, function (err) {
+              db.removeTaskFromUserOwnedTasks({ 'userId': oldTask._owner, 'taskId': oldTask.id }, function (err) {
+                // If the category has changed update tasksWithCategory in the 
+                // old and new categories
+                if (oldTask._category !== category) {
+                  db.getCategoryById(oldTask._category, (err, oldCategory) => {
+                    db.getCategoryById(category, (err, newCategory) => {
+                      var index = -1;
+                      if (!err && oldCategory) {
+                        index = oldCategory._tasksWithCategory.findIndex(function (element) {
+                          return element === oldTask.id;
                         });
-                      } else {
-                        console.log('Error ' + err);
+                        if (index >= 0) {
+                          oldCategory._tasksWithCategory.splice(index, 1);
+                          newCategory._tasksWithCategory.push(oldTask.id);
+                          db.findCategoryByIdAndUpdate(
+                            oldCategory.id, oldCategory, (err) => {
+                              if (!err) {
+                                db.findCategoryByIdAndUpdate(
+                                  newCategory.id, newCategory, (err) => {
+                                    if (!err) {
+                                      return res.redirect(303, '/tasks');
+                                    } else {
+                                      console.log('Error ' + err);
+                                    }
+                                  });
+                              } else {
+                                console.log('Error ' + err);
+                              }
+                            });
+                        }
                       }
                     });
-                  }
+                  });
+                } else {
+                  return res.redirect(303, '/tasks');
                 }
               });
             });
@@ -346,7 +345,6 @@ exports.editTaskPost = function (req, res) {
       });
     });
   });
-
 };
 
 exports.tasks = (req, res) => {
@@ -410,7 +408,7 @@ exports.tasks = (req, res) => {
             }));
 
             var context = {
-              loggedInUserFullName: loggedInUserFullName, 
+              loggedInUserFullName: loggedInUserFullName,
               notStartedTasks: notStartedTasks.map(((task) => {
                 let isOverdue = false,
                   timeOverdue = '';

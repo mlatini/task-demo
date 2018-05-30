@@ -34,8 +34,8 @@
         {{#each categories}}
           {{#unless archived}}
             <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">
+              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="background-color:{{colorBgHex}}" class="swatch new-color-swatch"></label>
               {{category}} 
-              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="color:{{colorBgHex}}" class="swatch fa fa-square"></label>
             </div> 
           {{/unless}}
         {{/each}}

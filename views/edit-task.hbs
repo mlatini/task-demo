@@ -21,7 +21,7 @@
     <div class="dropdown"> 
       <input class="dropdown-input" type="text" readonly id="owner" value="{{ownerFullName}}"><button id="owner-drop-btn" type="button" class="drop-arrow"><i class="drop-arrow fa fa-caret-down"></i></button>
       <div class="dropdown-content owner-dropdown-content hidden" id="owner-dropdown-content">
-        {{#each people}}
+        {{#each users}}
           {{#unless archived}}
             <div data-id={{id}} data-owner="{{fullName}}" class="owner-option">
               {{fullName}} 
@@ -39,8 +39,9 @@
       <div class="dropdown-content category-dropdown-content hidden" id="category-dropdown-content">
         {{#each categories}}
           {{#unless archived}}
-            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">{{category}}
-              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="color:{{colorBgHex}}" class="swatch fa fa-square"></label>
+            <div data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} class="category-option">
+              <label data-id={{id}} data-color={{colorName}} data-category={{category}} data-bgHex={{colorBgHex}} style="background-color:{{colorBgHex}}" class="swatch new-color-swatch"></label>
+              {{category}}
             </div> 
           {{/unless}}
         {{/each}}

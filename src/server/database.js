@@ -7,6 +7,7 @@ const Color = require('../../models/color');
 const Settings = require('../../models/settings');
 const Task = require('../../models/task');
 const User = require('../../models/user');
+const Role = require('../../models/role');
 
 module.exports = function Database() {
  let tenantId = '', 
@@ -46,10 +47,13 @@ this.getCurrentTenantId = function() {
     // Seed the Database with default data for the current user. 
     // This is intended to be called if a store doesn't exist. 
     let newTask1 = new Task(),
-    newTask2 = new Task(),
     newTask3 = new Task(),
-    newUser = new User(),
+    newUser1 = new User(),
+    newUser2 = new User(),
+    newUser3 = new User(),
     newSettings = new Settings(),
+    userRole = new Role(),
+    adminRole = new Role(),
     red = new Color(),
     black = new Color(),
     white = new Color(),
@@ -64,18 +68,22 @@ this.getCurrentTenantId = function() {
     financeCategory = new Category();
 
     let newDataStore = {
-      tasks: [ ],
-      users: [ ],
-      colors: [ ],
-      categories: [ ]
+      tasks: [],
+      users: [],
+      colors: [],
+      categories: [],
+      roles: []
     };
 
     // Create the id's first. They are required because users, tasks, etc
     // are linked by their id's. 
-    newUser.id = uuidv1();
+    newUser1.id = uuidv1();
+    newUser2.id = uuidv1();
+    newUser3.id = uuidv1();
     newSettings.id = uuidv1();
+    userRole.id = uuidv1();
+    adminRole.id = uuidv1();
     newTask1.id = uuidv1();
-    newTask2.id = uuidv1();
     newTask3.id = uuidv1();
     gettingStartedCategory.id = uuidv1();
     homeCategory.id = uuidv1();
@@ -90,15 +98,35 @@ this.getCurrentTenantId = function() {
     purple.id = uuidv1();
     pink.id = uuidv1();
 
-    // The default user
-    newUser.firstName = 'New';
-    newUser.lastName = 'User';
-    newUser._color = darkBlue.id;
-    newUser._settings = newSettings.id;
-    newUser._ownedTasks.push(newTask1.id);
-    newUser._ownedTasks.push(newTask2.id);
-    newUser._ownedTasks.push(newTask3.id);
-    newDataStore.users.push(newUser);
+    // The 1st default user
+    newUser1.firstName = 'Han';
+    newUser1.lastName = 'Solo';
+    newUser1._color = darkBlue.id;
+    newUser1._settings = newSettings.id;
+    newUser1._ownedTasks.push(newTask1.id);
+    newUser1._ownedTasks.push(newTask3.id);
+    newUser1._roles.push(userRole.id);
+    newUser1._roles.push(adminRole.id);
+    newDataStore.users.push(newUser1);
+
+    // The 2nd default user
+    newUser2.firstName = 'Anakin';
+    newUser2.lastName = 'Skywalker';
+    newUser2._color = purple.id;
+    newUser2._settings = newSettings.id;
+    newUser2._roles.push(userRole.id);
+    newUser2._roles.push(adminRole.id);
+    newDataStore.users.push(newUser2);
+
+    // The 3nd default user
+    newUser3.firstName = 'Obi-Wan';
+    newUser3.lastName = 'Kenobi';
+    newUser3._color = orange.id;
+    newUser3._settings = newSettings.id;
+    newUser3._roles.push(userRole.id);
+    newUser3._roles.push(adminRole.id);
+    newDataStore.users.push(newUser3);
+
 
     // The default settings
     newSettings.tasks.showCompletedTasks = true;
@@ -107,6 +135,11 @@ this.getCurrentTenantId = function() {
     newSettings.admin.showArchivedUsers = true;
     newDataStore.settings = newSettings;
 
+    // The default roles
+    userRole.name = 'User';
+    adminRole.name = 'Admin';
+    newDataStore.roles.push(userRole);
+    newDataStore.roles.push(adminRole);
 
     // The default tasks
     newTask1.dueDate = new Date();
@@ -121,27 +154,11 @@ this.getCurrentTenantId = function() {
       notStarted: true,
       deleted: false
     };
-    newTask1._owner = newUser.id;
-    newTask1._createdBy = newUser.id;
+    newTask1._owner = newUser1.id;
+    newTask1._createdBy = newUser1.id;
     newTask1._category = gettingStartedCategory.id;
     newDataStore.tasks.push(newTask1);
 
-    newTask2.dueDate = new Date();
-    newTask2.createdDate = new Date();
-    newTask2.title = 'Update your name';
-    newTask2.description = 'Click on "Admin" in the navigation bar and ' +
-      'change your name from "New User" to something more personal';
-    newTask2.status = {
-      completed: false,
-      paused: false,
-      inProgress: false,
-      notStarted: true,
-      deleted: false
-    };
-    newTask2._owner = newUser.id;
-    newTask2._createdBy = newUser.id;
-    newTask2._category = gettingStartedCategory.id;
-    newDataStore.tasks.push(newTask2);
 
     newTask3.dueDate = new Date();
     newTask3.createdDate = new Date();
@@ -172,8 +189,8 @@ this.getCurrentTenantId = function() {
     //    'Week'
     //    'Month'
     //    'Year'
-    newTask3._owner = newUser.id;
-    newTask3._createdBy = newUser.id;
+    newTask3._owner = newUser1.id;
+    newTask3._createdBy = newUser1.id;
     newTask3._category = gettingStartedCategory.id;
     newDataStore.tasks.push(newTask3);
 
@@ -182,7 +199,6 @@ this.getCurrentTenantId = function() {
     gettingStartedCategory.archived = false;
     gettingStartedCategory._color = red.id;
     gettingStartedCategory._tasksWithCategory.push(newTask1.id);
-    gettingStartedCategory._tasksWithCategory.push(newTask2.id);
     gettingStartedCategory._tasksWithCategory.push(newTask3.id);
     newDataStore.categories.push(gettingStartedCategory);
 
@@ -401,6 +417,63 @@ this.getCurrentTenantId = function() {
     });
   };
 
+  // save a new user to the database. 
+  // args:
+  //  user: a user object
+  //  callback(err, user)
+  // returns the newly created user to the callback.
+  this.saveNewUser = function(user, callback) {
+    const newUser1 = user || null;
+
+    let userToSave = {};
+
+    jsonfile.readFile(file, (err, db) => {
+      if(err) {
+        return callback(err, null);
+      } else {
+        if(newUser1) {
+          userToSave.id = uuidv1();
+          userToSave.firstName = newUser1.firstName;
+          userToSave.lastName = newUser1.lastName;
+          userToSave._roles = [];
+          userToSave._ownedTasks = [];
+          userToSave.archived = false;
+          for(let i = 0, max = db.colors.length; i < max; i += 1) {
+            if(db.colors[i].bghex === newUser1.bghex && 
+              db.colors[i].fgHex === newUser1.fgHex) {
+                userToSave._color = db.colors[i].id;
+                break;
+              }
+          }
+          if(newUser1.admin) {
+            for(let i = 0, max = db.roles.length; i < max; i += 1) {
+              if(db.roles.name === 'Admin' || db.roles.name === 'admin') {
+                userToSave._roles.push(db.roles[i].id);
+                break;
+              }
+            }
+          } else {
+            for(let i = 0, max = db.roles.length; i < max; i += 1) {
+              if(db.roles[i].name === 'User' || db.roles.name[i] === 'user') {
+                userToSave._roles.push(db.roles[i].id);
+                break;
+              }
+            }
+          }
+          db.users.push(userToSave);
+          jsonfile.writeFile(file, db, (err) => {
+            if(!err) {
+              return callback(null, JSON.parse(JSON.stringify(newUser1)));
+            } else {
+              return callback(err, null);
+            }
+          });
+        }
+      }
+      return('Unable to save new user', null);
+    });
+  };
+
   // Save a new task to the database. 
   // args:
   //  task: a task object
@@ -420,7 +493,7 @@ this.getCurrentTenantId = function() {
             if(!err) {
               return callback(null, JSON.parse(JSON.stringify(newTask)));
             } else {
-              return callback('err', null);
+              return callback(err, null);
             }
           });
         }
@@ -639,10 +712,9 @@ this.getCurrentTenantId = function() {
           if(!userToUpdate) {
             return callback('userId not found');
           } else {
-          // If 0 ownedTasks just push it and return the callback;
+          // If 0 ownedTasks just push it;
             if(userToUpdate._ownedTasks.length <= 0) {
-              userToUpdate._ownedTasks.push(taskId);
-              return callback(null);
+              ownedTaskExists = false;
             } else {
               // if >= 1 ownedTasks, make sure new taskId is unique. 
               for(let i = 0, max = userToUpdate._ownedTasks.length; 
@@ -652,18 +724,18 @@ this.getCurrentTenantId = function() {
                     break;
                   }
               }
-              // taskId not in _ownedTasks so push it and return.
-              if(!ownedTaskExists) {
-                userToUpdate._ownedTasks.push(taskId);
-                jsonfile.writeFile(file, db, (err) => {
-                  if(err) {
-                    return callback('Unable to save updated _ownedTasks');
-                  } else {
-                    return callback(null);
-                  }
-                });
-              }
             }
+          }
+          // If the onwed task doesn't exist push it and return.
+          if(!ownedTaskExists) {
+            userToUpdate._ownedTasks.push(taskId);
+            jsonfile.writeFile(file, db, (err) => {
+              if(err) {
+                return callback('Unable to save updated _ownedTasks');
+              } else {
+                return callback(null);
+              }
+            });
           }
         }
       });
@@ -705,11 +777,11 @@ this.getCurrentTenantId = function() {
             // and return callback with a null error. 
             // If _ownedTasks doesn't contain taskId return callback with error. 
           } else {
-            let index = userToUpdate.ownedTasks.findIndex((ownedTask) => {
-              return options.taskId.equals(ownedTask);
+            let index = userToUpdate._ownedTasks.findIndex((ownedTask) => {
+              return options.taskId === ownedTask;
             });
             if(index > -1) {
-              userToUpdate.ownedTasks.splice(index, 1);
+              userToUpdate._ownedTasks.splice(index, 1);
               jsonfile.writeFile(file, db, (err) => {
                 if(!err) {
                   return callback(null);
@@ -779,13 +851,57 @@ this.getCurrentTenantId = function() {
 
   this.getAllUsers = function(options, callback) {
     // args:
-    //  options: not used yet. Here for future expansion so I don't have
-    //    change the interface if  want to expand the query options. 
+    //  options:
+    //    populateRoles
+    //    populateOwnedTasks
+    //    populateColor
     //  callback(err, users)
+    const populateRoles = options.populateRoles || null, 
+      populateOwnedTasks = options.populateOwnedTasks || null, 
+      populateColor = options.populateColor || null;
+
+    let roles = new HashTable(),
+      tasks = new HashTable(),
+      colors = new HashTable();
+
     jsonfile.readFile(file, (err, db) => {
       if(err) {
         return callback('No users returned', null);
       } else {
+        if(populateRoles) {
+          db.roles.forEach( (role) => {
+            roles.put(role.id, role);
+          });
+          db.users.forEach( (user) => {
+            let userRoles = [];
+            user._roles.forEach( (role) => {
+              userRoles.push(roles.get(role));
+            });
+            user._roles = userRoles;
+          });
+        }
+        if(populateOwnedTasks) {
+          db.tasks.forEach((task) => {
+            tasks.put(task.id, task);      
+          });
+          db.users.forEach( (user) => {
+            let userTasks = [];
+            user._ownedTasks.forEach( (task) => {
+              userTasks.push(tasks.get(task));
+            });
+            user._ownedTasks = userTasks;
+          });
+        }
+        if(populateColor) {
+          db.colors.forEach((color) => {
+            colors.put(color.id, color);
+          });
+          db.users.forEach( (user) => {
+            let userColor = '';
+            userColor = colors.get(user._color);
+            user._color = userColor;
+          });
+        }
         return callback(null, JSON.parse(JSON.stringify(db.users)));
       }
     });
@@ -877,6 +993,82 @@ this.getCurrentTenantId = function() {
       return callback(null, JSON.parse(JSON.stringify(categoriesToReturn)));
       }
     });
+  };
+
+
+  // Update users. This will take a user as an input and update it in the db. 
+  //
+  //  Args:
+  //    options {
+  //    user: based on mongoose model
+  //    roles: string array of roles
+  //    currentlyAdmin: bool indicating if user is currently in admin role
+  //    currentlyUser: bool indicating if user is currently in user role
+  //  }
+  //    callback(err, user)
+  this.findUserByIdAndUpdate = function(options, callback) {
+    const updatedUser = options.user || null,
+      roles = options.roles || null,
+      currentlyAdmin = options.currentlyAdmin,
+      currentlyUser = options.currentlyUser;
+
+    let userToUpdate = {};
+
+    if(updatedUser === null || roles === null || currentlyAdmin === null || 
+      currentlyUser === null) {
+        return callback('Invalid arguments passed to findUserByIdAndUpdate', null);
+      } else {
+        jsonfile.readFile(file, (err, db) => {
+          if(err) {
+            return callback('Unable to open database', null);
+          } else {
+            // find the user to update
+            for(let i = 0, max = db.users.length; i < max; i += 1) {
+              if(db.users[i].id === updatedUser.id) {
+                userToUpdate = db.users[i];
+                break;
+              }
+            }
+            if(updatedUser.firstName !== null && 
+              updatedUser.firstName !== undefined) {
+                userToUpdate.firstName = updatedUser.firstName;
+            } 
+            if(updatedUser.lastName !== null && 
+              updatedUser.lastName !== undefined) {
+                userToUpdate.lastName = updatedUser.lastName;
+            } 
+            if(updatedUser._color !== null &&
+              updatedUser._color !== undefined) {
+                userToUpdate._color = updatedUser._color;
+            }
+            if(updatedUser._roles !== null && 
+              updatedUser._roles !== undefined) {
+                updatedUser._roles.forEach((updatedRole) => {
+                  let roleMatch = false;
+                  userToUpdate._roles.forEach((currentRole) => {
+                    if(currentRole.id === updatedRole.id) {
+                      roleMatch = true;
+                    }
+                  });
+                  if(roleMatch === false) {
+                    userToUpdate._roles.push(updatedRole);
+                  }
+                });
+            }
+            if(updatedUser.archived !== null && 
+              updatedUser.archived !== undefined) {
+                userToUpdate.archived = updatedUser.archived;
+            }
+            jsonfile.writeFile(file, db, (err) => {
+              if(err) {
+                return callback('Error saving user to database', null);
+              } else {
+                return callback(null, JSON.parse(JSON.stringify(userToUpdate)));
+              }
+            });
+          }
+        });
+      }
   };
 
   // Update category. This will take a category as an input and update it 

@@ -39,7 +39,8 @@ var activateNewCategoryMode = function() {
     link.classList.remove('show');
   });
  
-  // Clear out the 'choose a color' dropdown so it doesn't keep populating
+  // Clear out the 'choose a color' dropdown so it doesn't continuously
+  // populate in a loop each time there's an update. 
   while(newColorContent.firstChild) {
     newColorContent.removeChild(newColorContent.firstChild);
   }

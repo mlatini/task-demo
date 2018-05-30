@@ -1,6 +1,7 @@
 const tasks = require('./handlers/tasks'),
   api = require('./handlers/api'),
-  categories = require('./handlers/categories');
+  categories = require('./handlers/categories'),
+  admin = require('./handlers/admin');
 
 module.exports = ((app) => {
   // task
@@ -13,6 +14,8 @@ module.exports = ((app) => {
 
   // Categories
   app.get('/edit-categories', categories.editCategories);
+
+  app.get('/admin', admin.adminGet);
 
 
   // api
@@ -28,6 +31,8 @@ module.exports = ((app) => {
   app.post('/api/task/delete-previous/:id', api.deletePreviousTask);
 
   app.get('/api/user/get-all-users', api.getAllUsers);
+  app.post('/api/user/save-new-user', api.saveNewUser);
+  app.post('/api/user/update', api.updateUser);
 
   app.get('/api/get-all-colors', api.getAllColors);
 

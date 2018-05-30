@@ -116,9 +116,9 @@ exports.postCategory = function(category, callback) {
 // call /api/register post method to save the new user to the database
 exports.postUser = function(user, callback) {
   var xhttp = new XMLHttpRequest();
-  xhttp.open('POST', '/api/register', true);
+  xhttp.open('POST', '/api/user/save-new-user', true);
   xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify(user));
+  xhttp.send(JSON.stringify({ 'user': user }));
   // wait for the callback so I can return the new user
   xhttp.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {

@@ -51,6 +51,29 @@ exports.updateCategory = ((req, res) => {
   });
 });
 
+exports.updateUser = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      db.findUserByIdAndUpdate({ 
+        'user': req.body.user,
+        'roles': req.body.roles,
+        'currentlyAdmin': req.body.currentlyAdmin,
+        'currentlyUser': req.body.currentlyUser
+      }, (err, user) => {
+        if(err) {
+          res.send({ 'error': err, 'user': null });
+        } else {
+          res.send({ 'error': null, 'user': user });
+        }
+      });
+    }
+  });
+});
+
 exports.getAllUsers = ((req, res) => {
   const Database = require('../src/server/database');
 
@@ -122,6 +145,24 @@ exports.saveNewTask = ((req, res) => {
           res.send({ 'error': err, 'task': null });
         } else {
           res.send({ 'error': null, 'task': task });
+        }
+      });
+    }
+  });
+});
+
+exports.saveNewUser = ((req, res) => {
+  const Database = require('../src/server/database');
+
+  let db = new Database();
+
+  db.initialize(req.session.sessionId, (err) => {
+    if(!err) {
+      db.saveNewUser(req.body.user, (err,user) => {
+        if(err) {
+          res.send({ 'error': err, 'task': null });
+        } else {
+          res.send({ 'error': null, 'user': user });
         }
       });
     }

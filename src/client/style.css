@@ -554,7 +554,7 @@ color: red;
   padding-bottom: 1em;
 }
 
-.new-category-input, .new-User-input {
+.new-category-input, .new-user-input {
   font-size: 16px;
   padding: .50em;
   display: inline-block;
@@ -650,3 +650,19 @@ color: red;
   padding-right: 10px;
   text-align: right;
 }
+
+.admin-form-block {
+  display: inline-block;
+}
+
+/* admin page start */
+.user-task-count {
+  display: inline-block;
+  width: 50%;
+}
+
+.admin-form-label,.admin-form-input {
+  display: block;
+}
+
+/* admin page end */
