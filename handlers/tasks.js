@@ -20,7 +20,6 @@ exports.editTaskGet = function (req, res) {
     } else {
       db.getTaskById({ 'id': taskId, 'populateCreatedBy': true, 'populateOwner': true, 'populateCategory': true }, (err, task) => {
         db.getAllUsers({}, (err, users) => {
-          console.log('users', users)
           db.getAllCategories({ 'populateColor': true }, (err, categories) => {
             // Find the frequency cadence to pass to the view which will be used to
             // choose the 'selected' option in the cadence dropdown
@@ -362,7 +361,6 @@ exports.tasks = (req, res) => {
     if (err) {
       res.send('Error in database initialization');
     } else {
-
       database.getAllTasks({ 'populateOwner': true, 'populateCategory': true },
         ((err, tasks) => {
           database.getSettings(((err, settings) => {
@@ -394,16 +392,36 @@ exports.tasks = (req, res) => {
             }
 
             tasks.forEach(((task) => {
-              if (task.status.notStarted) {
-                notStartedTasks.push(task);
-              } else if (task.status.inProgress) {
-                inProgressTasks.push(task);
-              } else if (task.status.paused) {
-                pausedTasks.push(task);
-              } else if (task.status.completed) {
-                completedTasks.push(task);
-              } else if (task.status.deleted) {
-                deletedTasks.push(task);
+              // if settings.showOnlyMyTasks then only populate the tasks
+              // from the currently logged in user
+              if(settings.tasks.showOnlyMyTasks) {
+                if(task.owner.id === req.user.id) {
+                  if (task.status.notStarted) {
+                    notStartedTasks.push(task);
+                  } else if (task.status.inProgress) {
+                    inProgressTasks.push(task);
+                  } else if (task.status.paused) {
+                    pausedTasks.push(task);
+                  } else if (task.status.completed) {
+                    completedTasks.push(task);
+                  } else if (task.status.deleted) {
+                    deletedTasks.push(task);
+                  }
+                }
+              } else {
+                // If settings.showOnlyMyTasks === false then populate
+                // all the tasks
+                if (task.status.notStarted) {
+                  notStartedTasks.push(task);
+                } else if (task.status.inProgress) {
+                  inProgressTasks.push(task);
+                } else if (task.status.paused) {
+                  pausedTasks.push(task);
+                } else if (task.status.completed) {
+                  completedTasks.push(task);
+                } else if (task.status.deleted) {
+                  deletedTasks.push(task);
+                }
               }
             }));
 
