@@ -38,7 +38,8 @@ document.getElementById('show-completed-check').onclick = function() {
   var settings = {
     tasks : {
       showCompletedTasks : this.checked,
-      showDeletedTasks : document.getElementById('show-deleted-check').checked
+      showDeletedTasks : document.getElementById('show-deleted-check').checked,
+      showOnlyMyTasks: document.getElementById('show-only-my-tasks-check').checked
     }
   };
   dataServices.updateSettings(settings, function(err, settings) {
@@ -52,7 +53,22 @@ document.getElementById('show-deleted-check').onclick = function() {
     tenantId : 1,
     tasks : {
       showDeletedTasks : this.checked,
-      showCompletedTasks : document.getElementById('show-completed-check').checked
+      showCompletedTasks : document.getElementById('show-completed-check').checked,
+      showOnlyMyTasks: document.getElementById('show-only-my-tasks-check').checked
+    }
+  };
+  dataServices.updateSettings(settings, function(err) {
+    if(!err) {
+      location.reload(true);
+    }
+  });
+};
+document.getElementById('show-only-my-tasks-check').onclick = function() {
+  var settings = {
+    tasks: {
+      showOnlyMyTasks: this.checked,
+      showDeletedTasks: document.getElementById('show-deleted-check').checked,
+      showCompletedTasks: document.getElementById('show-completed-check').checked
     }
   };
   dataServices.updateSettings(settings, function(err) {

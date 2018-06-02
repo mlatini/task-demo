@@ -829,6 +829,9 @@ this.getCurrentTenantId = function() {
         if(settings.tasks.showDeletedTasks !== null) {
           db.settings.tasks.showDeletedTasks = settings.tasks.showDeletedTasks;
         }
+        if(settings.tasks.showOnlyMyTasks !== null) {
+          db.settings.tasks.showOnlyMyTasks = settings.tasks.showOnlyMyTasks;
+        }
       }
       if(settings.categories) {
         if(settings.categories.showArchivedTasks !== null) {
