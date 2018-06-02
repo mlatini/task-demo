@@ -306,8 +306,32 @@ var saveNewCategory = function() {
   });
 };
 
+let populateUsersDropdown = function() {
+  const dataServices = require('../client/data-services'), 
+    usersDropdownList = document.getElementById('users-list');
 
-window.onload = function () {
+  dataServices.getAllUsers( (err, users) => {
+    if(!err) {
+      // populate the users dropdown list. 
+      users.forEach( (user) => {
+        const userFullName = user.firstName + ' ' + user.lastName;
+
+        let usersListItem = document.createElement('li'), 
+          usersListItemLink = document.createElement('a');
+
+        usersListItemLink.setAttribute('class', 'nav-link');
+        usersListItemLink.setAttribute('data-id', user.id);
+        usersListItemLink.textContent = userFullName;
+
+        usersListItem.appendChild(usersListItemLink);
+        usersDropdownList.appendChild(usersListItem);
+      });
+    }
+  });
+};
+
+window.onload = function() {
+  populateUsersDropdown();
   //highlight the page in the navbar
   document.getElementById('edit-categories-link').classList.toggle('active-page-link');
 };

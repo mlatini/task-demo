@@ -25,31 +25,3 @@ document.getElementById('logged-in-user-full-name').onclick = function() {
     content.classList.remove('show');
   }
 };
-
-let populateUsersDropdown = function() {
-  const dataServices = require('../client/data-services'), 
-    usersDropdownList = document.getElementById('users-list');
-
-  dataServices.getAllUsers( (err, users) => {
-    if(!err) {
-      // populate the users dropdown list. 
-      users.forEach( (user) => {
-        const userFullName = user.firstName + ' ' + user.lastName;
-
-        let usersListItem = document.createElement('li'), 
-          usersListItemLink = document.createElement('a');
-
-        usersListItemLink.setAttribute('class', 'nav-link');
-        usersListItemLink.setAttribute('data-id', user.id);
-        usersListItemLink.textContent = userFullName;
-
-        usersListItem.appendChild(usersListItemLink);
-        usersDropdownList.appendChild(usersListItem);
-      });
-    }
-  });
-};
-
-window.onload = function() {
-  populateUsersDropdown();
-};
