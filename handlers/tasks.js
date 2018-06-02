@@ -562,6 +562,7 @@ exports.tasks = (req, res) => {
               })),
               showCompletedTasks: settings.tasks.showCompletedTasks,
               showDeletedTasks: settings.tasks.showDeletedTasks,
+              showOnlyMyTasks: settings.tasks.showOnlyMyTasks,
               threeColumn: threeColumn,
               fourColumn: fourColumn,
               fiveColumn: fiveColumn
