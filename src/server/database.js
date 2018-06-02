@@ -131,6 +131,7 @@ this.getCurrentTenantId = function() {
     // The default settings
     newSettings.tasks.showCompletedTasks = true;
     newSettings.tasks.showDeletedTasks = true;
+    newSettings.tasks.showOnlyMyTasks = true;
     newSettings.categories.showArchivedTasks = true;
     newSettings.admin.showArchivedUsers = true;
     newDataStore.settings = newSettings;
