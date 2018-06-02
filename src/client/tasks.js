@@ -1,7 +1,33 @@
 var dataServices = require('./data-services.js');
 var moment = require('moment');
 
-window.onload = function () {
+let populateUsersDropdown = function() {
+  const dataServices = require('../client/data-services'), 
+    usersDropdownList = document.getElementById('users-list');
+
+  dataServices.getAllUsers( (err, users) => {
+    if(!err) {
+      // populate the users dropdown list. 
+      users.forEach( (user) => {
+        const userFullName = user.firstName + ' ' + user.lastName;
+
+        let usersListItem = document.createElement('li'), 
+          usersListItemLink = document.createElement('a');
+
+        usersListItemLink.setAttribute('class', 'nav-link');
+        usersListItemLink.setAttribute('data-id', user.id);
+        usersListItemLink.textContent = userFullName;
+
+        usersListItem.appendChild(usersListItemLink);
+        usersDropdownList.appendChild(usersListItem);
+      });
+    }
+  });
+};
+
+window.onload = function() {
+  populateUsersDropdown();
+
   //highlight the page in the navbar
   document.getElementById('tasks-link').classList.toggle('active-page-link');
 };
