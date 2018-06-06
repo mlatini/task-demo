@@ -18,6 +18,12 @@
   {{else}}
     <input type="checkbox" id="show-deleted-check" name="show-deleted-check">
   {{/if}}
+  <label for="show-my-tasks">Show Only My Tasks</label>
+    {{#if showOnlyMyTasks}}
+      <input type="checkbox" checked id="show-only-my-tasks-check" name="show-only-my-tasks-check">
+    {{else}}
+      <input type="checkbox" id="show-only-my-tasks-check" name="show-only-my-tasks-check">
+    {{/if}}
 </div>
 
 <div class="content">

@@ -3,7 +3,8 @@ module.exports = function Settings() {
   this.tasks = {};
   // this.tasks = {
   //     showCompletedTasks: true,
-  //     showDeletedTasks: true
+  //     showDeletedTasks: true,
+  //     showOnlyMyTasks: true
   // };
   this.categories = {};
   // this.categories = {

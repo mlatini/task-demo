@@ -131,6 +131,7 @@ this.getCurrentTenantId = function() {
     // The default settings
     newSettings.tasks.showCompletedTasks = true;
     newSettings.tasks.showDeletedTasks = true;
+    newSettings.tasks.showOnlyMyTasks = true;
     newSettings.categories.showArchivedTasks = true;
     newSettings.admin.showArchivedUsers = true;
     newDataStore.settings = newSettings;
@@ -827,6 +828,9 @@ this.getCurrentTenantId = function() {
         }
         if(settings.tasks.showDeletedTasks !== null) {
           db.settings.tasks.showDeletedTasks = settings.tasks.showDeletedTasks;
+        }
+        if(settings.tasks.showOnlyMyTasks !== null) {
+          db.settings.tasks.showOnlyMyTasks = settings.tasks.showOnlyMyTasks;
         }
       }
       if(settings.categories) {
