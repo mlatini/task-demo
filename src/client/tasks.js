@@ -1,33 +1,9 @@
 var dataServices = require('./data-services.js');
+var common = require('./common');
 var moment = require('moment');
 
-let populateUsersDropdown = function() {
-  const dataServices = require('../client/data-services'), 
-    usersDropdownList = document.getElementById('users-list');
-
-  dataServices.getAllUsers( (err, users) => {
-    if(!err) {
-      // populate the users dropdown list. 
-      users.forEach( (user) => {
-        const userFullName = user.firstName + ' ' + user.lastName;
-
-        let usersListItem = document.createElement('li'), 
-          usersListItemLink = document.createElement('a');
-
-        usersListItemLink.setAttribute('class', 'nav-link');
-        usersListItemLink.setAttribute('data-id', user.id);
-        usersListItemLink.setAttribute('id', 'users-list-item-link' + user.id);
-        usersListItemLink.textContent = userFullName;
-
-        usersListItem.appendChild(usersListItemLink);
-        usersDropdownList.appendChild(usersListItem);
-      });
-    }
-  });
-};
-
 window.onload = function() {
-  populateUsersDropdown();
+  common.populateUsersDropdown();
 
   //highlight the page in the navbar
   document.getElementById('tasks-link').classList.toggle('active-page-link');
@@ -82,7 +58,8 @@ document.getElementById('show-only-my-tasks-check').onclick = function() {
 // When the user clicks on the status buttons, change
 // the status in the db and refresh the page
 document.addEventListener('click', function() {
-  const taskId = event.target.dataset.id;
+  console.log('target', event.target.dataset.id);
+  const id = event.target.dataset.id;
 
   let taskStatus = '', 
     task = '';
@@ -90,7 +67,7 @@ document.addEventListener('click', function() {
   if (event.target.matches('.start')) {
     taskStatus = { 'completed' : false, 'paused' : false, 
       'inProgress' : true, 'notStarted' : false };
-    task = {'id' : taskId, status : taskStatus};
+    task = {'id' : id, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -102,7 +79,7 @@ document.addEventListener('click', function() {
     console.log('pause');
     taskStatus = { 'completed' : false, 'paused' : true, 
       'inProgress' : false, 'notStarted' : false };
-    task = {'id' : taskId, status : taskStatus};
+    task = {'id' : id, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -114,13 +91,13 @@ document.addEventListener('click', function() {
     // update task to completed state and then update it in the db
     taskStatus = { 'completed' : true, 'paused' : false, 
       'inProgress' : false, 'notStarted' : false };
-    task = {'completedDate' : new Date(), 'id' : taskId, status : taskStatus};
+    task = {'completedDate' : new Date(), 'id' : id, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
-        //addTaskToCompleted(taskId, function() { 
-          makeNewTask(taskId, function(err, newTask) {
+        //addTaskToCompleted(id, function() { 
+          makeNewTask(id, function(err, newTask) {
             if (err) {
-              console.log(err.message + ' taskID: ' + taskId);
+              console.log(err.message + ' taskID: ' + id);
             }
             saveTask(newTask, function(err) {
               // Getting an err is normal if I'm passing in a null task,
@@ -139,7 +116,7 @@ document.addEventListener('click', function() {
   } else if (event.target.matches('.stop')) {
     taskStatus = { 'completed' : false, 'paused' : false,
       'inProgress' : false, 'notStarted' : true };
-    task = {'id' : taskId, status : taskStatus};
+    task = {'id' : id, status : taskStatus};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);
@@ -152,9 +129,9 @@ document.addEventListener('click', function() {
     // created task. 
     taskStatus = { 'completed' : false, 'paused' : true, 
       'inProgress' : false, 'notStarted' : false };
-    task = { 'id' : taskId, status : taskStatus };
+    task = { 'id' : id, status : taskStatus };
     dataServices.updateTaskStatus(task, function() {
-      dataServices.deleteAutoCreatedTask(taskId, function(err, task) {
+      dataServices.deleteAutoCreatedTask(id, function(err, task) {
         if(!err) {
           location.reload(true);
         } else {
@@ -165,9 +142,9 @@ document.addEventListener('click', function() {
   } else if (event.target.matches('.skip')) {
     // Create a new task based on the cadence of the current task. 
     // Since the current task is being skipped it can be permanately deleted. 
-    makeNewTask(taskId, function(err, newTask) {
+    makeNewTask(id, function(err, newTask) {
       if(!err) {
-        dataServices.deleteTask(taskId, function(err) {
+        dataServices.deleteTask(id, function(err) {
           if(!err) {
             saveTask(newTask, function(err) {
               // Getting an err is normal if I'm passing in a null task
@@ -179,10 +156,10 @@ document.addEventListener('click', function() {
               }
             });
             if(err) {
-              console.log(err.message + ' taskID: ' + taskId);
+              console.log(err.message + ' taskID: ' + id);
             }
           } else {
-            console.log('Error deleting task: ' + taskId);
+            console.log('Error deleting task: ' + id);
           }
         });
       } else {
@@ -194,7 +171,7 @@ document.addEventListener('click', function() {
     // Change the task status to deleted and set the deleted date. 
     taskStatus = { 'completed' : false, 'paused' : false, 'inProgress' : false,
       'notStarted' : false, 'deleted' : true };
-    task = { 'id' : taskId, status : taskStatus, deletedDate : new Date()};
+    task = { 'id' : id, status : taskStatus, deletedDate : new Date()};
     dataServices.updateTaskStatus(task, function(err) {
       if(!err) {
         location.reload(true);

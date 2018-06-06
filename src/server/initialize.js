@@ -11,7 +11,6 @@ module.exports = function initialize() {
     if(!req.session.sessionId) {
       // Since this is the first time the app is run after the DB has been 
       // created, populate req.session.sessionId and req.user. 
-      // At this point there is only a single user. 
       req.session.sessionId = uuidv1(); 
     } 
     // Initialize the current user into the session. In the event that 

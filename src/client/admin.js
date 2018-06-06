@@ -1,32 +1,8 @@
 var dataServices = require('./data-services.js');
 var common = require('./common.js');
 
-let populateUsersDropdown = function() {
-  const dataServices = require('../client/data-services'), 
-    usersDropdownList = document.getElementById('users-list');
-
-  dataServices.getAllUsers( (err, users) => {
-    if(!err) {
-      // populate the users dropdown list. 
-      users.forEach( (user) => {
-        const userFullName = user.firstName + ' ' + user.lastName;
-
-        let usersListItem = document.createElement('li'), 
-          usersListItemLink = document.createElement('a');
-
-        usersListItemLink.setAttribute('class', 'nav-link');
-        usersListItemLink.setAttribute('data-id', user.id);
-        usersListItemLink.textContent = userFullName;
-
-        usersListItem.appendChild(usersListItemLink);
-        usersDropdownList.appendChild(usersListItem);
-      });
-    }
-  });
-};
-
 window.onload = function() {
-  populateUsersDropdown();
+  common.populateUsersDropdown();
   // Highlight the page in the navbar
   document.getElementById('admin-link').classList.toggle('active-page-link');
 };
