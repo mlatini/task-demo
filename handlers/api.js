@@ -3,7 +3,9 @@ exports.updateSettings = ((req, res) => {
 
   let db = new Database();
 
-  db.initialize(req.session.sessionId, (err) => { if(!err) { db.updateSettings(req.body.settings, (err, settings) => {
+  db.initialize(req.session.sessionId, (err) => { 
+    if(!err) { 
+      db.updateSettings(req.body.settings, (err, settings) => {
         if(err) {
           res.send({ 'error': err, 'settings': null });
         } else {
