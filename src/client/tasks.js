@@ -16,6 +16,7 @@ let populateUsersDropdown = function() {
 
         usersListItemLink.setAttribute('class', 'nav-link');
         usersListItemLink.setAttribute('data-id', user.id);
+        usersListItemLink.setAttribute('id', 'users-list-item-link' + user.id);
         usersListItemLink.textContent = userFullName;
 
         usersListItem.appendChild(usersListItemLink);
