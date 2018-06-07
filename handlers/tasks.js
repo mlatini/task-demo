@@ -49,8 +49,8 @@ exports.editTaskGet = function (req, res) {
             }
             var context = {
               message: req.flash('error'),
-              loggedInUserFullName: req.user.firstName + ' ' +
-                req.user.lastName,
+              loggedInUserFullName: req.session.user.firstName + ' ' +
+                req.session.user.lastName,
               taskId: task.id,
               dueDate: task.dueDate,
               createdDate: task.createdDate,
@@ -115,9 +115,9 @@ exports.addTaskGet = function (req, res) {
         db.getAllUsers({}, (err, users) => {
           var context = {
             message: req.flash('error'),
-            loggedInUserId: req.user.id,
-            loggedInUserFullName: req.user.firstName + ' ' +
-              req.user.lastName,
+            loggedInUserId: req.session.user.id,
+            loggedInUserFullName: req.session.user.firstName + ' ' +
+              req.session.user.lastName,
             currentDateTime: moment(),
             categories: categories.map(function (category) {
               return {
@@ -191,7 +191,7 @@ exports.addTaskPost = function (req, res) {
     },
     _category: req.body['category-id'],
     _owner: req.body['owner-id'],
-    _createdBy: req.user.id,
+    _createdBy: req.session.user.id,
   };
 
   db.saveNewTask(newTask, (err, task) => {
@@ -348,8 +348,8 @@ exports.editTaskPost = function (req, res) {
 
 exports.tasks = (req, res) => {
   let sessionId = req.session.sessionId ? req.session.sessionId : null,
-    loggedInUserFullName = req.user.firstName + ' ' +
-      req.user.lastName,
+    loggedInUserFullName = req.session.user.firstName + ' ' +
+      req.session.user.lastName,
     database = new Database(),
     notStartedTasks = [],
     inProgressTasks = [],
@@ -395,7 +395,7 @@ exports.tasks = (req, res) => {
               // if settings.showOnlyMyTasks then only populate the tasks
               // from the currently logged in user
               if(settings.tasks.showOnlyMyTasks) {
-                if(task.owner.id === req.user.id) {
+                if(task.owner.id === req.session.user.id) {
                   if (task.status.notStarted) {
                     notStartedTasks.push(task);
                   } else if (task.status.inProgress) {
