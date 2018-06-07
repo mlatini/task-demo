@@ -34,6 +34,7 @@ module.exports = ((app) => {
   app.post('/api/user/save-new-user', api.saveNewUser);
   app.post('/api/user/update', api.updateUser);
   app.post('/api/user/current/change', api.changeCurrentUser);
+  app.get('/api/user/current/get', api.getCurrentlyLoggedInUser);
 
   app.get('/api/get-all-colors', api.getAllColors);
 
