@@ -25,8 +25,8 @@ exports.adminGet = function (req, res) {
             });
             var context = {
               showArchivedUsers: settings.admin.showArchivedUsers,
-              loggedInUserFullName: req.user.firstName + ' ' +
-                req.user.lastName,
+              loggedInUserFullName: req.session.user.firstName + ' ' +
+                req.session.user.lastName,
               activeUsersCount: activeUsersCount,
               archivedUsersCount: archivedUsersCount,
               users: users.map(function (user) {

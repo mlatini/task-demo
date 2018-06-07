@@ -60,8 +60,6 @@ exports.getAllUsers = function(callback) {
   xhttp.send();
 };
 
-
-
 // Updated functions end. 
 
 // call /colors get method to query the database and get a list

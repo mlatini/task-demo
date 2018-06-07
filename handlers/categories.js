@@ -19,8 +19,8 @@ exports.editCategories = function (req, res) {
               }
             });
             var context = {
-              loggedInUserFullName : req.user.firstName + ' ' +
-                req.user.lastName,
+              loggedInUserFullName : req.session.user.firstName + ' ' +
+                req.session.user.lastName,
               showArchived : settings.categories.showArchivedTasks,
               archivedCategoryCount : archivedCategoryCount,
               activeCategoryCount : activeCategoryCount,

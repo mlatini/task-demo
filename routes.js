@@ -33,6 +33,7 @@ module.exports = ((app) => {
   app.get('/api/user/get-all-users', api.getAllUsers);
   app.post('/api/user/save-new-user', api.saveNewUser);
   app.post('/api/user/update', api.updateUser);
+  app.post('/api/user/current/change', api.changeCurrentUser);
 
   app.get('/api/get-all-colors', api.getAllColors);
 
