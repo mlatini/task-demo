@@ -111,29 +111,53 @@ exports.updateColorSwatch = function(target, options) {
   selectedColorName.value =  target.dataset.color;
 };
 
+function getCurrentlyLoggedInUser(callback) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    if(this.readyState === 4 && this.status === 200) {
+      if (JSON.parse(this.responseText).error) {
+        return callback(JSON.parse(this.responseText).error, null);
+      } else {
+        return callback(null, JSON.parse(this.responseText).user);
+      }
+    }
+  };
+  const url = '/api/user/current/get';
+  xhttp.open('GET', url , true);
+  xhttp.send();
+
+}
+
 exports.populateUsersDropdown = function() {
   const dataServices = require('../client/data-services'), 
     usersDropdownList = document.getElementById('users-list');
+  
+    getCurrentlyLoggedInUser( (err, currentlyLoggedInUser) => {
+      if(!err && currentlyLoggedInUser) {
+        dataServices.getAllUsers( (err, users) => {
+          if(!err) {
+            // populate the users dropdown list. 
+            users.forEach( (user) => {
+              // Don't populate the current user in the list
+              if(user.id !== currentlyLoggedInUser.id) {
+                const userFullName = user.firstName + ' ' + user.lastName;
 
-  dataServices.getAllUsers( (err, users) => {
-    if(!err) {
-      // populate the users dropdown list. 
-      users.forEach( (user) => {
-        const userFullName = user.firstName + ' ' + user.lastName;
+                let usersListItem = document.createElement('li'), 
+                  usersListItemLink = document.createElement('a');
 
-        let usersListItem = document.createElement('li'), 
-          usersListItemLink = document.createElement('a');
+                usersListItemLink.setAttribute('class', 'nav-link users-list-item');
+                usersListItemLink.setAttribute('data-id', user.id);
+                usersListItemLink.setAttribute('id', 'users-list-item-link' + user.id);
+                usersListItemLink.textContent = userFullName;
 
-        usersListItemLink.setAttribute('class', 'nav-link users-list-item');
-        usersListItemLink.setAttribute('data-id', user.id);
-        usersListItemLink.setAttribute('id', 'users-list-item-link' + user.id);
-        usersListItemLink.textContent = userFullName;
-
-        usersListItem.appendChild(usersListItemLink);
-        usersDropdownList.appendChild(usersListItem);
-      });
-    }
-  });
+                usersListItem.appendChild(usersListItemLink);
+                usersDropdownList.appendChild(usersListItem);
+              }
+            });
+          }
+        });
+      }
+    });
 };
 
 // This function will change the currently active user by updating req.session.user

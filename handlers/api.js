@@ -53,6 +53,14 @@ exports.updateCategory = ((req, res) => {
   });
 });
 
+exports.getCurrentlyLoggedInUser = ((req, res) => {
+  if(req.session.user) {
+    res.send({ 'user': req.session.user });
+  } else {
+    res.send({ 'user': null });
+  }
+});
+
 exports.changeCurrentUser = ((req, res) => {
   if(req.body.user) {
     req.session.user = req.body.user;
