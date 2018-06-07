@@ -42,7 +42,7 @@ app.use(bodyParser.json());
    // The routes
 require('./routes.js')(app); 
 
-app.listen(3000, (( () => {
+app.listen(process.env.PORT || 3000, (( () => {
   console.log('Task demo listening on port 3000');
 })));
 
