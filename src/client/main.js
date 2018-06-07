@@ -1,4 +1,5 @@
 import './style.css';
+const common = require('./common');
 
 // document.getElementById('nav-user-dropdown').onclick = function() {
 //   console.log('nav-user-dropdown');
@@ -25,3 +26,13 @@ document.getElementById('logged-in-user-full-name').onclick = function() {
     content.classList.remove('show');
   }
 };
+
+document.addEventListener('click', () => {
+  if(event.target.matches('.users-list-item')) {
+    common.changeCurrentUser(event.target.dataset.id, (err) => {
+      if(!err) {
+        location.reload(true);
+      }
+    });
+  }
+});

@@ -58,7 +58,6 @@ document.getElementById('show-only-my-tasks-check').onclick = function() {
 // When the user clicks on the status buttons, change
 // the status in the db and refresh the page
 document.addEventListener('click', function() {
-  console.log('target', event.target.dataset.id);
   const id = event.target.dataset.id;
 
   let taskStatus = '', 

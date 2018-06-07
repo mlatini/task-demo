@@ -1,5 +1,7 @@
 //COMMON.JS
 //This is the common functions that will be used by 2 or more other scripts.
+const hashtable = require('./../server/hashtable'), 
+  dataServices = require('./data-services');
 
 
 // create a new color option and return it in a callback
@@ -122,7 +124,7 @@ exports.populateUsersDropdown = function() {
         let usersListItem = document.createElement('li'), 
           usersListItemLink = document.createElement('a');
 
-        usersListItemLink.setAttribute('class', 'nav-link');
+        usersListItemLink.setAttribute('class', 'nav-link users-list-item');
         usersListItemLink.setAttribute('data-id', user.id);
         usersListItemLink.setAttribute('id', 'users-list-item-link' + user.id);
         usersListItemLink.textContent = userFullName;
@@ -133,3 +135,36 @@ exports.populateUsersDropdown = function() {
     }
   });
 };
+
+// This function will change the currently active user by updating req.session.user
+// with the userID that's passed in. 
+exports.changeCurrentUser = function(userId, callback) {
+  const usersHash = new hashtable;
+  let updatedUser = {};
+
+  dataServices.getAllUsers( (err, users) => {
+    if(err) {
+      return callback('err');
+    } else {
+      users.forEach( (user) => {
+        usersHash.put(user.id, user);
+      });
+      updatedUser = usersHash.get(userId);
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if(this.readyState === 4 && this.status === 200) {
+          if(JSON.parse(this.responseText).error) {
+            return callback(JSON.parse(this.responseText).error);
+          } else {
+            return callback('');
+          }
+        }
+      };
+      var url = '/api/user/current/change';
+      xhttp.open('POST', url, true);
+      xhttp.setRequestHeader('Content-type', 'application/json');
+      xhttp.send(JSON.stringify({ 'user': updatedUser}));
+    }
+  });
+}

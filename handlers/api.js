@@ -53,6 +53,15 @@ exports.updateCategory = ((req, res) => {
   });
 });
 
+exports.changeCurrentUser = ((req, res) => {
+  if(req.body.user) {
+    req.session.user = req.body.user;
+    res.send({ 'error': null });
+  } else {
+    res.send({ 'error': 'req.body.user is null' });
+  }
+});
+
 exports.updateUser = ((req, res) => {
   const Database = require('../src/server/database');
 
