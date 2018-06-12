@@ -26,7 +26,7 @@ this.getCurrentTenantId = function() {
     return callback('Database initialization failed due to invalid id');
   } else {
     tenantId = id;
-    file = 'tmp/' + tenantId + '.json';
+    file = '/tmp/' + tenantId + '.json';
     jsonfile.readFile(file, (err, object) => {
       if(err || !object) {
         Seed(( (err) => {
