@@ -3,8 +3,7 @@ const express = require('express'),
   cookieSession = require('cookie-session'),
   initialize = require('./src/server/initialize'),
   bodyParser = require ('body-parser'),
-  flash = require('connect-flash'),
-  path = require('path');
+  flash = require('connect-flash');
 
 const app = express();
 
@@ -17,8 +16,8 @@ app.engine('.hbs', handlebars({
 }));
 app.set('view engine', '.hbs');
 
-app.use(express.static(path.join(__dirname,  'dist')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/dist', express.static('dist'));
+app.use('/public', express.static(__dirname + '/public'));
 
 app.use(cookieSession({
   name: 'session',
