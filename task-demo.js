@@ -16,7 +16,7 @@ app.engine('.hbs', handlebars({
 }));
 app.set('view engine', '.hbs');
 
-app.use('/dist', express.static('dist'));
+app.use('/dist', express.static(__dirname + '/dist'));
 app.use('/public', express.static(__dirname + '/public'));
 
 app.use(cookieSession({
