@@ -47,7 +47,15 @@ this.getCurrentTenantId = function() {
     // Seed the Database with default data for the current user. 
     // This is intended to be called if a store doesn't exist. 
     let newTask1 = new Task(),
+    newTask2 = new Task(),
     newTask3 = new Task(),
+    newTask4 = new Task(),
+    newTask5 = new Task(),
+    newTask6 = new Task(),
+    newTask7 = new Task(),
+    newTask8 = new Task(),
+    newTask9 = new Task(),
+    newTask10 = new Task(),
     newUser1 = new User(),
     newUser2 = new User(),
     newUser3 = new User(),
@@ -84,7 +92,15 @@ this.getCurrentTenantId = function() {
     userRole.id = uuidv1();
     adminRole.id = uuidv1();
     newTask1.id = uuidv1();
+    newTask2.id = uuidv1();
     newTask3.id = uuidv1();
+    newTask4.id = uuidv1();
+    newTask5.id = uuidv1();
+    newTask6.id = uuidv1();
+    newTask7.id = uuidv1();
+    newTask8.id = uuidv1();
+    newTask9.id = uuidv1();
+    newTask10.id = uuidv1();
     gettingStartedCategory.id = uuidv1();
     homeCategory.id = uuidv1();
     financeCategory.id = uuidv1();
@@ -99,19 +115,19 @@ this.getCurrentTenantId = function() {
     pink.id = uuidv1();
 
     // The 1st default user
-    newUser1.firstName = 'Han';
-    newUser1.lastName = 'Solo';
+    newUser1.firstName = 'Markus';
+    newUser1.lastName = 'Markony';
     newUser1._color = darkBlue.id;
     newUser1._settings = newSettings.id;
     newUser1._ownedTasks.push(newTask1.id);
-    newUser1._ownedTasks.push(newTask3.id);
+    newUser1._ownedTasks.push(newTask2.id);
     newUser1._roles.push(userRole.id);
     newUser1._roles.push(adminRole.id);
     newDataStore.users.push(newUser1);
 
     // The 2nd default user
-    newUser2.firstName = 'Anakin';
-    newUser2.lastName = 'Skywalker';
+    newUser2.firstName = 'Timothy';
+    newUser2.lastName = 'Tohonovich';
     newUser2._color = purple.id;
     newUser2._settings = newSettings.id;
     newUser2._roles.push(userRole.id);
@@ -119,8 +135,8 @@ this.getCurrentTenantId = function() {
     newDataStore.users.push(newUser2);
 
     // The 3nd default user
-    newUser3.firstName = 'Obi-Wan';
-    newUser3.lastName = 'Kenobi';
+    newUser3.firstName = 'Daniel';
+    newUser3.lastName = 'Devo';
     newUser3._color = orange.id;
     newUser3._settings = newSettings.id;
     newUser3._roles.push(userRole.id);
@@ -161,12 +177,12 @@ this.getCurrentTenantId = function() {
     newDataStore.tasks.push(newTask1);
 
 
-    newTask3.dueDate = new Date();
-    newTask3.createdDate = new Date();
-    newTask3.title = 'Recurring Task';
-    newTask3.description = 'Recurring tasks will auto-create a new follow-up ' +
+    newTask2.dueDate = new Date();
+    newTask2.createdDate = new Date();
+    newTask2.title = 'Recurring Task';
+    newTask2.description = 'Recurring tasks will auto-create a new follow-up ' +
       ' task when completed. Try completing this task to see how that works.';
-    newTask3.status = {
+    newTask2.status = {
       completed: false,
       paused: false,
       inProgress: false,
@@ -174,7 +190,7 @@ this.getCurrentTenantId = function() {
       deleted: false
     };
     // Recurrence of evey 5 days. 
-    newTask3.frequency = {
+    newTask2.frequency = {
       'time': 5,
       'cadence': 'Day'
     };
@@ -190,17 +206,149 @@ this.getCurrentTenantId = function() {
     //    'Week'
     //    'Month'
     //    'Year'
+    newTask2._owner = newUser1.id;
+    newTask2._createdBy = newUser1.id;
+    newTask2._category = gettingStartedCategory.id;
+    newDataStore.tasks.push(newTask2);
+
+    newTask3.dueDate = new Date();
+    newTask3.createdDate = new Date();
+    newTask3.title = 'In progress task';
+    newTask3.description = 'When you are ready to work on a task, click on' + 
+      '"Start Task", which is the Play button at the bottom of the task. ' +
+      'This will move the task to the "In Progress" column."';
+    newTask3.status = {
+      completed: false,
+      paused: false,
+      inProgress: true,
+      notStarted: false,
+      deleted: false
+    };
     newTask3._owner = newUser1.id;
     newTask3._createdBy = newUser1.id;
     newTask3._category = gettingStartedCategory.id;
     newDataStore.tasks.push(newTask3);
+
+    newTask4.dueDate = new Date();
+    newTask4.createdDate = new Date();
+    newTask4.title = 'Mow the lawn';
+    newTask4.description = 'Make sure to check for rocks so you don\'t break ' +
+      'any windows';
+    newTask4.status = {
+      completed: false,
+      paused: false,
+      inProgress: true,
+      notStarted: false,
+      deleted: false
+    };
+    newTask4._owner = newUser2.id;
+    newTask4._createdBy = newUser2.id;
+    newTask4._category = homeCategory.id;
+    newDataStore.tasks.push(newTask4);
+
+    newTask5.dueDate = new Date();
+    newTask5.createdDate = new Date();
+    newTask5.title = 'Deleted tasks';
+    newTask5.description = 'Deleted tasks can be recovered.';
+    newTask5.status = {
+      completed: false,
+      paused: false,
+      inProgress: false,
+      notStarted: false,
+      deleted: true
+    };
+    newTask5._owner = newUser1.id;
+    newTask5._createdBy = newUser1.id;
+    newTask5._category = homeCategory.id;
+    newDataStore.tasks.push(newTask5);
+
+    newTask6.dueDate = new Date();
+    newTask6.createdDate = new Date();
+    newTask6.title = 'Paused tasks'; 
+    newTask6.description = 'Paused tasks are tasks you have already started ' +
+      'but that you put on hold for some reason and will continue later';
+    newTask6.status = {
+      completed: false,
+      paused: true,
+      inProgress: false,
+      notStarted: false,
+      deleted: false
+    };
+    newTask6._owner = newUser1.id;
+    newTask6._createdBy = newUser1.id;
+    newTask6._category = gettingStartedCategory.id;
+    newDataStore.tasks.push(newTask6);
+
+    newTask7.dueDate = new Date();
+    newTask7.createdDate = new Date();
+    newTask7.title = 'Fix the pantry door';
+    newTask7.description = 'Probably need some anchors to fix the stripped holes';
+    newTask7.status = {
+      completed: false,
+      paused: false,
+      inProgress: false, 
+      notStarted: true,
+      deleted: false
+    };
+    newTask7._owner = newUser2.id;
+    newTask7._createdBy = newUser2.id;
+    newTask7._category = homeCategory.id;
+    newDataStore.tasks.push(newTask7);
+
+    newTask8.dueDate = new Date();
+    newTask8.createdDate = new Date();
+    newTask8.title = 'Look into lower mortgage rates';
+    newTask8.description = 'The rates have come down. Maybe I can get a better rate';
+    newTask8.status = {
+      completed: false,
+      paused: true,
+      inProgress: false,
+      notStarted: false,
+      deleted: false
+    };
+    newTask8._owner = newUser2.id;
+    newTask8._createdBy = newUser2.id;
+    newTask8._category = financeCategory.id;
+    newDataStore.tasks.push(newTask8);
+
+    newTask9.dueDate = new Date();
+    newTask9.createdDate = new Date();
+    newTask9.title = 'Completed Task';
+    newTask9.description = 'Completed tasks can be reactivated within 72 hours';
+    newTask9.status = {
+      completed: true,
+      paused: false,
+      inProgress: false,
+      notStarted: false,
+      deleted: false
+    };
+    newTask9._owner = newUser1.id;
+    newTask9._createdBy = newUser1.id;
+    newTask9._category = gettingStartedCategory.id;
+    newDataStore.tasks.push(newTask9);
+
+    newTask10.dueDate = new Date();
+    newTask10.createdDate = new Date();
+    newTask10.title = 'Clean the gutters on the house';
+    newTask10.description = '';
+    newTask10.status = {
+      completed: true,
+      paused: false,
+      inProgress: false,
+      notStarted: true,
+      deleted: false
+    };
+    newTask10._owner = newUser3.id;
+    newTask10._createdBy = newUser3.id;
+    newTask10._category = homeCategory.id;
+    newDataStore.tasks.push(newTask10);
 
     // The default categories
     gettingStartedCategory.name = 'getting started';
     gettingStartedCategory.archived = false;
     gettingStartedCategory._color = red.id;
     gettingStartedCategory._tasksWithCategory.push(newTask1.id);
-    gettingStartedCategory._tasksWithCategory.push(newTask3.id);
+    gettingStartedCategory._tasksWithCategory.push(newTask2.id);
     newDataStore.categories.push(gettingStartedCategory);
 
     homeCategory.name = 'home';
