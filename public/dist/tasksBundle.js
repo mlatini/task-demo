@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 130);
+/******/ 	return __webpack_require__(__webpack_require__.s = 125);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1911,7 +1911,7 @@ function loadLocale(name) {
         try {
             oldLocale = globalLocale._abbr;
             var aliasedRequire = require;
-            __webpack_require__(132)("./" + name);
+            __webpack_require__(127)("./" + name);
             getSetGlobalLocale(oldLocale);
         } catch (e) {}
     }
@@ -4603,7 +4603,7 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(131)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(126)(module)))
 
 /***/ }),
 /* 1 */
@@ -16996,12 +16996,7 @@ return zhTw;
 
 /***/ }),
 /* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var dataServices = __webpack_require__(1);
@@ -17223,7 +17218,6 @@ document.addEventListener('click', function() {
   } else if (event.target.matches('.undo-completed-task')) {
     handleUndoCompleted(id);
   } else if (event.target.matches('.skip')) {
-    console.log('skip button clicky click');
     handleSkip(id);
   } else if (event.target.matches('.delete-task-icon')) {
     handleDelete(id);
@@ -17232,8 +17226,6 @@ document.addEventListener('click', function() {
 
 document.addEventListener('touchend', function() {
   const id = event.target.dataset.id;
-
-  //event.preventDefault();
 
   if (event.target.matches('.start')) {
     handleStart(id);
@@ -17338,7 +17330,7 @@ var addTaskToCompleted = function (taskId, callback) {
 */
 
 /***/ }),
-/* 131 */
+/* 126 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17366,7 +17358,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 132 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -17623,7 +17615,7 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 132;
+webpackContext.id = 127;
 
 /***/ })
 /******/ ]);
