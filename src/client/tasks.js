@@ -227,7 +227,7 @@ document.addEventListener('click', function() {
 document.addEventListener('touchend', function() {
   const id = event.target.dataset.id;
 
-  event.preventDefault();
+  //event.preventDefault();
 
   if (event.target.matches('.start')) {
     handleStart(id);
