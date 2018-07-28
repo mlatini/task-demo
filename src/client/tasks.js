@@ -55,129 +55,195 @@ document.getElementById('show-only-my-tasks-check').onclick = function() {
   });
 };
 
+function handleStart(id) {
+  let taskStatus = '', 
+    task = '';
+
+  taskStatus = { 'completed' : false, 'paused' : false, 
+    'inProgress' : true, 'notStarted' : false };
+  task = {'id' : id, status : taskStatus};
+  dataServices.updateTaskStatus(task, function(err) {
+    if(!err) {
+      location.reload(true);
+    } else {
+      // TODO: notify user if there's and error and leave as is 
+    }
+  });
+}
+
+function handlePause(id) {
+  let taskStatus = '', 
+    task = '';
+
+  taskStatus = { 'completed' : false, 'paused' : true, 
+    'inProgress' : false, 'notStarted' : false };
+  task = {'id' : id, status : taskStatus};
+  dataServices.updateTaskStatus(task, function(err) {
+    if(!err) {
+      location.reload(true);
+    } else {
+      // TODO: notify user if there's and error and leave as is
+    } 
+  });
+}
+
+function handleComplete(id) {
+  let taskStatus = '', 
+    task = '';
+
+  // update task to completed state and then update it in the db
+  taskStatus = { 'completed' : true, 'paused' : false, 
+    'inProgress' : false, 'notStarted' : false };
+  task = {'completedDate' : new Date(), 'id' : id, status : taskStatus};
+  dataServices.updateTaskStatus(task, function(err) {
+    if(!err) {
+      //addTaskToCompleted(id, function() { 
+        makeNewTask(id, function(err, newTask) {
+          if (err) {
+            console.log(err.message + ' taskID: ' + id);
+          }
+          saveTask(newTask, function(err) {
+            // Getting an err is normal if I'm passing in a null task,
+            // which would be the case if this is a non-recurring task
+            if (err) {
+              console.log(err.message);
+            }
+            location.reload(true);
+          });
+        });
+      //});
+    } else {
+      // TODO: notify user if there's an error and leave as is
+    }
+  });
+}
+
+function handleStop(id) {
+  let taskStatus = '', 
+    task = '';
+
+  taskStatus = { 'completed' : false, 'paused' : false,
+    'inProgress' : false, 'notStarted' : true };
+  task = {'id' : id, status : taskStatus};
+  dataServices.updateTaskStatus(task, function(err) {
+    if(!err) {
+      location.reload(true);
+    } else {
+      // TODO: notify user if there's and error and leave as is
+    }
+  });
+}
+
+function handleUndoCompleted(id) {
+  let taskStatus = '', 
+    task = '';
+
+  // change the completed task status to inProgress and delete the newly 
+  // created task. 
+  taskStatus = { 'completed' : false, 'paused' : true, 
+    'inProgress' : false, 'notStarted' : false };
+  task = { 'id' : id, status : taskStatus };
+  dataServices.updateTaskStatus(task, function() {
+    dataServices.deleteAutoCreatedTask(id, function(err, task) {
+      if(!err) {
+        location.reload(true);
+      } else {
+        // TODO: notify user if there's an error and leave as it
+      }
+    });
+  });
+}
+
+function handleSkip(id) {
+  // Create a new task based on the cadence of the current task. 
+  // Since the current task is being skipped it can be permanately deleted. 
+  makeNewTask(id, function(err, newTask) {
+    if(!err) {
+      dataServices.deleteTask(id, function(err) {
+        if(!err) {
+          saveTask(newTask, function(err) {
+            // Getting an err is normal if I'm passing in a null task
+            // which would be the case if this is a non-recurring task.
+            if(err) {
+              console.log(err.message);
+            } else {
+              location.reload(true);
+            }
+          });
+          if(err) {
+            console.log(err.message + ' taskID: ' + id);
+          }
+        } else {
+          console.log('Error deleting task: ' + id);
+        }
+      });
+    } else {
+      // TODO: notify user via flash or something else
+    }
+  });
+}
+
+function handleDelete(id) {
+  let taskStatus = '', 
+    task = '';
+
+  console.log('delete me');
+  // Change the task status to deleted and set the deleted date. 
+  taskStatus = { 'completed' : false, 'paused' : false, 'inProgress' : false,
+    'notStarted' : false, 'deleted' : true };
+  task = { 'id' : id, status : taskStatus, deletedDate : new Date()};
+  dataServices.updateTaskStatus(task, function(err) {
+    if(!err) {
+      location.reload(true);
+    } else {
+      // TODO: notiny user if there's an error
+    }
+  });
+}
+
 // When the user clicks on the status buttons, change
 // the status in the db and refresh the page
 document.addEventListener('click', function() {
   const id = event.target.dataset.id;
 
-  let taskStatus = '', 
-    task = '';
+  if (event.target.matches('.start')) {
+    handleStart(id);
+  } else if (event.target.matches('.pause')) {
+    handlePause(id);
+  } else if (event.target.matches('.complete')) {
+    handleComplete(id);
+  } else if (event.target.matches('.stop')) {
+    handleStop(id);
+  } else if (event.target.matches('.undo-completed-task')) {
+    handleUndoCompleted(id);
+  } else if (event.target.matches('.skip')) {
+    console.log('skip button clicky click');
+    handleSkip(id);
+  } else if (event.target.matches('.delete-task-icon')) {
+    handleDelete(id);
+  } 
+});
+
+document.addEventListener('touchend', function() {
+  const id = event.target.dataset.id;
+
+  event.preventDefault();
 
   if (event.target.matches('.start')) {
-    taskStatus = { 'completed' : false, 'paused' : false, 
-      'inProgress' : true, 'notStarted' : false };
-    task = {'id' : id, status : taskStatus};
-    dataServices.updateTaskStatus(task, function(err) {
-      if(!err) {
-        location.reload(true);
-      } else {
-        // TODO: notify user if there's and error and leave as is 
-      }
-    });
+    handleStart(id);
   } else if (event.target.matches('.pause')) {
-    console.log('pause');
-    taskStatus = { 'completed' : false, 'paused' : true, 
-      'inProgress' : false, 'notStarted' : false };
-    task = {'id' : id, status : taskStatus};
-    dataServices.updateTaskStatus(task, function(err) {
-      if(!err) {
-        location.reload(true);
-      } else {
-        // TODO: notify user if there's and error and leave as is
-      } 
-    });
+    handlePause(id);
   } else if (event.target.matches('.complete')) {
-    // update task to completed state and then update it in the db
-    taskStatus = { 'completed' : true, 'paused' : false, 
-      'inProgress' : false, 'notStarted' : false };
-    task = {'completedDate' : new Date(), 'id' : id, status : taskStatus};
-    dataServices.updateTaskStatus(task, function(err) {
-      if(!err) {
-        //addTaskToCompleted(id, function() { 
-          makeNewTask(id, function(err, newTask) {
-            if (err) {
-              console.log(err.message + ' taskID: ' + id);
-            }
-            saveTask(newTask, function(err) {
-              // Getting an err is normal if I'm passing in a null task,
-              // which would be the case if this is a non-recurring task
-              if (err) {
-                console.log(err.message);
-              }
-              location.reload(true);
-            });
-          });
-        //});
-      } else {
-        // TODO: notify user if there's an error and leave as is
-      }
-    });
+    handleComplete(id);
   } else if (event.target.matches('.stop')) {
-    taskStatus = { 'completed' : false, 'paused' : false,
-      'inProgress' : false, 'notStarted' : true };
-    task = {'id' : id, status : taskStatus};
-    dataServices.updateTaskStatus(task, function(err) {
-      if(!err) {
-        location.reload(true);
-      } else {
-        // TODO: notify user if there's and error and leave as is
-      }
-    });
+    handleStop(id);
   } else if (event.target.matches('.undo-completed-task')) {
-    // change the completed task status to inProgress and delete the newly 
-    // created task. 
-    taskStatus = { 'completed' : false, 'paused' : true, 
-      'inProgress' : false, 'notStarted' : false };
-    task = { 'id' : id, status : taskStatus };
-    dataServices.updateTaskStatus(task, function() {
-      dataServices.deleteAutoCreatedTask(id, function(err, task) {
-        if(!err) {
-          location.reload(true);
-        } else {
-          // TODO: notify user if there's an error and leave as it
-        }
-      });
-    });
+    handleUndoCompleted(id);
   } else if (event.target.matches('.skip')) {
-    // Create a new task based on the cadence of the current task. 
-    // Since the current task is being skipped it can be permanately deleted. 
-    makeNewTask(id, function(err, newTask) {
-      if(!err) {
-        dataServices.deleteTask(id, function(err) {
-          if(!err) {
-            saveTask(newTask, function(err) {
-              // Getting an err is normal if I'm passing in a null task
-              // which would be the case if this is a non-recurring task.
-              if(err) {
-                console.log(err.message);
-              } else {
-                location.reload(true);
-              }
-            });
-            if(err) {
-              console.log(err.message + ' taskID: ' + id);
-            }
-          } else {
-            console.log('Error deleting task: ' + id);
-          }
-        });
-      } else {
-        // TODO: notify user via flash or something else
-      }
-    });
+    console.log('skip button clicky click');
+    handleSkip(id);
   } else if (event.target.matches('.delete-task-icon')) {
-    console.log('delete me');
-    // Change the task status to deleted and set the deleted date. 
-    taskStatus = { 'completed' : false, 'paused' : false, 'inProgress' : false,
-      'notStarted' : false, 'deleted' : true };
-    task = { 'id' : id, status : taskStatus, deletedDate : new Date()};
-    dataServices.updateTaskStatus(task, function(err) {
-      if(!err) {
-        location.reload(true);
-      } else {
-        // TODO: notiny user if there's an error
-      }
-    });
+    handleDelete(id);
   } 
 });
 
