@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 135);
+/******/ 	return __webpack_require__(__webpack_require__.s = 130);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -410,7 +410,7 @@ exports.unArchiveUser = function(id, callback) {
 
 /***/ }),
 
-/***/ 135:
+/***/ 130:
 /***/ (function(module, exports, __webpack_require__) {
 
 let dataServices = __webpack_require__(1),

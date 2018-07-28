@@ -17218,7 +17218,6 @@ document.addEventListener('click', function() {
   } else if (event.target.matches('.undo-completed-task')) {
     handleUndoCompleted(id);
   } else if (event.target.matches('.skip')) {
-    console.log('skip button clicky click');
     handleSkip(id);
   } else if (event.target.matches('.delete-task-icon')) {
     handleDelete(id);
@@ -17227,8 +17226,6 @@ document.addEventListener('click', function() {
 
 document.addEventListener('touchend', function() {
   const id = event.target.dataset.id;
-
-  //event.preventDefault();
 
   if (event.target.matches('.start')) {
     handleStart(id);
