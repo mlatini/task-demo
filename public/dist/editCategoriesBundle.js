@@ -834,6 +834,16 @@ document.addEventListener('touchend', function() {
     // the user is creating a new category. It's hidden by default but will 
     // show when the user clicks the color swatch. 
     document.getElementById('new-color-content').classList.toggle('show');
+  } else if (eventTarget.matches('.edit-color-label') ||
+      eventTarget.matches('.edit-color-dropdown') ||
+      eventTarget.matches('.edit-color-name') ||
+      eventTarget.matches('.edit-color-dropdown-caret')
+    ) {
+    // editColorContent is the dropdown which shows the available colors when
+    // the user is editing a category. It's hidden by default but will show
+    // when the user clicks on the color swatch during editing
+    document.getElementById('edit-color-content' + eventTarget.dataset.categoryid)
+      .classList.toggle('show');
     }
 });
 
