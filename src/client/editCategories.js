@@ -402,10 +402,29 @@ var cancelNewCategoryMode = function() {
 
 };
 
+document.addEventListener('touchup', function() {
+  var eventTarget = event.target;
+
+    // editColorContent is the dropdown which shows the available colors when
+    // the user is editing a category. It's hidden by default but will show
+    // when the user clicks on the color swatch during editing
+    document.getElementById('edit-color-content' + eventTarget.dataset.categoryid)
+      .classList.toggle('show');
+  if (eventTarget.matches('.new-color-label') || 
+      eventTarget.matches('.new-category-dropdown') ||
+      eventTarget.matches('.new-color-name') ||
+      eventTarget.matches('.new-color-dropdown-caret')
+    ) {
+    // newColorContent is the dropdown which shows the available colors when
+    // the user is creating a new category. It's hidden by default but will 
+    // show when the user clicks the color swatch. 
+    document.getElementById('new-color-content').classList.toggle('show');
+    }
+});
+
 document.addEventListener('click', function() {
   var selectedColorIdInput = document.getElementById('selected-color-id');
   var eventTarget = event.target;
-  console.log(eventTarget);
   
   if (eventTarget.matches('.archive-category-link')) {
     // When the user clicks on the archive link, call archiveCategory from 
