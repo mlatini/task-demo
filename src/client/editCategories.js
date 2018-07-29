@@ -414,7 +414,7 @@ document.addEventListener('touchend', function() {
       eventTarget.matches('.new-category-dropdown') ||
       eventTarget.matches('.new-color-name') ||
       eventTarget.matches('.new-color-dropdown-caret')
-    ) {
+  ) {
     // newColorContent is the dropdown which shows the available colors when
     // the user is creating a new category. It's hidden by default but will 
     // show when the user clicks the color swatch. 
@@ -423,13 +423,23 @@ document.addEventListener('touchend', function() {
       eventTarget.matches('.edit-color-dropdown') ||
       eventTarget.matches('.edit-color-name') ||
       eventTarget.matches('.edit-color-dropdown-caret')
-    ) {
+  ) {
     // editColorContent is the dropdown which shows the available colors when
     // the user is editing a category. It's hidden by default but will show
     // when the user clicks on the color swatch during editing
     document.getElementById('edit-color-content' + eventTarget.dataset.categoryid)
       .classList.toggle('show');
-    }
+    } else if (eventTarget.matches('.edit-color-option') || 
+    eventTarget.matches('.edit-color-swatch') ||
+    eventTarget.matches('.edit-color-swatch-name')
+  ) {
+    // editColorOption is an item in the list of colors which shows when
+    // the user clicks on the color swatch.
+    // When the user clicks on this, the color swatch background
+    // and name should change
+    // The data attributes should also change to reflect the new color
+    common.updateColorSwatch(eventTarget, { 'editColor' : true, 'newColor' : false});
+  }
 });
 
 document.addEventListener('click', function() {
