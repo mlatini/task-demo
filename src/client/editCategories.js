@@ -402,7 +402,7 @@ var cancelNewCategoryMode = function() {
 
 };
 
-document.addEventListener('touchup', function() {
+document.addEventListener('touchend', function() {
   var eventTarget = event.target;
 
     // editColorContent is the dropdown which shows the available colors when
