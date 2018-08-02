@@ -283,6 +283,8 @@ var saveEditedCategory = function(id) {
 };
 
 var saveNewCategory = function() {
+  console.log('saveNewCategory called');
+
   var newCategoryInput = document.getElementById('new-category-input');
   var selectedColorId = document.getElementById('selected-color-id');
 
@@ -401,7 +403,6 @@ var cancelNewCategoryMode = function() {
   newCategoryInput.value = '';
 
 };
-
 
 var handleClick = function(eventTarget) {
   if (eventTarget.matches('.archive-category-link')) {
