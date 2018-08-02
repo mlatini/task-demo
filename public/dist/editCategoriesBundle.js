@@ -892,10 +892,12 @@ var handleClick = function(eventTarget) {
 
 document.addEventListener('click', function() {
   //var selectedColorIdInput = document.getElementById('selected-color-id');
+  console.log('click event listener');
   handleClick(event.target);
 });
 
 document.addEventListener('touchend', function() {
+  console.log('touch event listener');
   handleClick(event.target);
 });
 
