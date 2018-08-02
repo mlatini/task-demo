@@ -513,7 +513,6 @@ color: red;
   padding: .2em;
 }
 
-
 .grid-container {
   border-top-style: solid;
   border-left-style: solid;
@@ -530,20 +529,20 @@ color: red;
 
 .grid-item-left {
   display: inline-block;
-  width: 33%;
+  width: 43%;
   vertical-align: middle;
 }
 
 .grid-item-middle {
   display: inline-block;
-  width: 33%;
+  width: 43%;
   vertical-align: middle;
   text-align: center;
 }
 
 .grid-item-right {
   display: inline-block;
-  width: 33%;
+  width: 13%;
   padding-right: 1px;
   vertical-align: middle;
   text-align: right;
