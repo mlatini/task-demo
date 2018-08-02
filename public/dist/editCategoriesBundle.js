@@ -698,6 +698,8 @@ var saveEditedCategory = function(id) {
 };
 
 var saveNewCategory = function() {
+  console.log('saveNewCategory called');
+
   var newCategoryInput = document.getElementById('new-category-input');
   var selectedColorId = document.getElementById('selected-color-id');
 
@@ -817,11 +819,7 @@ var cancelNewCategoryMode = function() {
 
 };
 
-document.addEventListener('click', function() {
-  var selectedColorIdInput = document.getElementById('selected-color-id');
-  var eventTarget = event.target;
-  console.log(eventTarget);
-  
+var handleClick = function(eventTarget) {
   if (eventTarget.matches('.archive-category-link')) {
     // When the user clicks on the archive link, call archiveCategory from 
     // data-services. 
@@ -890,8 +888,18 @@ document.addEventListener('click', function() {
     //    currentColorName
     cancelCategoryEditMode(eventTarget.dataset.id); 
   }
+};
+
+document.addEventListener('click', function() {
+  //var selectedColorIdInput = document.getElementById('selected-color-id');
+  console.log('click event listener');
+  handleClick(event.target);
 });
 
+document.addEventListener('touchend', function() {
+  console.log('touch event listener');
+  handleClick(event.target);
+});
 
 /***/ }),
 
