@@ -15,7 +15,7 @@ The interface is very simple and functional.
 
 I chose to build the entire application mostly using vanilla JavaScript, with Handlebars for templating. I did that for a very simple reason which was to focus on JavaScript development and DOM manipulation. I'm currently re-building the front-end in React but this is still a work in progress. 
 
-I also created a version of this application which is a multi-tenant application backed by a mongo database. In order to create a simpler application for demonstration purposes, which didn't require registration and didn't persist changes long-term, I'm using a cookie to identify the session. The maxAge of this cookie is set to 24 hours. For storage, I'm using a json file named after the session id from the cookie which allows me to easily reference the file. 
+I originally created this application as a multi-tenant application backed by a mongo database. In order to create a simpler application for demonstration purposes, which didn't require registration and didn't persist changes long-term, I'm now simply storing the data in a json file. I'm using a cookie to identify the session and the maxAge of this cookie is set to 24 hours. For storage, I'm using a json file named after the session id from the cookie which allows me to easily reference the file. 
 
 What all of this means is that each session will have its own unique datastore so tasks can be created, modified, etc but only persist for 24 hours. The json file is stored in /tmp on the local filesystem. During development the files will get cleaned up with the regular operating system /tmp cleanup. I've been deploying the app on Heroku, and Heroku automatically cleans the /tmp dir every 24 hours so the deployed version stays clean. 
 
